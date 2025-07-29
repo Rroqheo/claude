@@ -1,13 +1,13 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/92fd93ed-e71b-4b94-b270-50684323dd00" alt="Claudia Logo" width="120" height="120">
+  <img src="https://github.com/user-attachments/assets/92fd93ed-e71b-4b94-b270-50684323dd00" alt="Claudia Ultimate Logo" width="120" height="120">
 
-  <a href="https://claudiacode.com"><h1>Claudia</h1></a>
+  <h1>🚀 Claudia Ultimate Edition</h1>
   
   <p>
-    <strong>A powerful GUI app and Toolkit for Claude Code</strong>
+    <strong>终极版多AI桌面应用 - 集成Claude、ChatGPT、Gemini、Grok等多种AI服务</strong>
   </p>
   <p>
-    <strong>Create custom agents, manage interactive Claude Code sessions, run secure background agents, and more.</strong>
+    <strong>Create custom agents, manage multi-AI sessions, track investments, and build the future of AI-powered development.</strong>
   </p>
   
   <p>
@@ -15,6 +15,14 @@
     <a href="#installation"><img src="https://img.shields.io/badge/Install-🚀-green?style=for-the-badge" alt="Installation"></a>
     <a href="#usage"><img src="https://img.shields.io/badge/Usage-📖-purple?style=for-the-badge" alt="Usage"></a>
     <a href="#development"><img src="https://img.shields.io/badge/Develop-🛠️-orange?style=for-the-badge" alt="Development"></a>
+  </p>
+  
+  <p>
+    <img src="https://img.shields.io/badge/Tauri-2.0-blue?style=flat-square&logo=tauri" alt="Tauri 2.0">
+    <img src="https://img.shields.io/badge/React-18-blue?style=flat-square&logo=react" alt="React 18">
+    <img src="https://img.shields.io/badge/Rust-Latest-orange?style=flat-square&logo=rust" alt="Rust">
+    <img src="https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript" alt="TypeScript">
+    <img src="https://img.shields.io/badge/License-AGPL-green?style=flat-square" alt="License">
   </p>
 </div>
 
@@ -27,27 +35,37 @@ https://github.com/user-attachments/assets/bf0bdf9d-ba91-45af-9ac4-7274f57075cf
 
 ## 🌟 Overview
 
-**Claudia** is a powerful desktop application that transforms how you interact with Claude Code. Built with Tauri 2, it provides a beautiful GUI for managing your Claude Code sessions, creating custom agents, tracking usage, and much more.
+**Claudia Ultimate Edition** is a revolutionary desktop application that brings together multiple AI services in one powerful interface. Built with Tauri 2 and React, it's not just a Claude Code GUI - it's your ultimate AI development companion.
 
-Think of Claudia as your command center for Claude Code - bridging the gap between the command-line tool and a visual experience that makes AI-assisted development more intuitive and productive.
+### 🎯 What Makes Claudia Ultimate Special?
+
+- **🤖 Multi-AI Integration**: Seamlessly switch between Claude, ChatGPT, Gemini, Grok, Qwen, and Ollama
+- **💰 Investment Dashboard**: Track your crypto and stock investments with real-time data
+- **🎨 Dynamic Themes**: Beautiful themes for each AI service (Claude, ChatGPT, Gemini, Grok, Hell Gate)
+- **🔧 Advanced Agent System**: Create and deploy custom AI agents with specialized capabilities
+- **📊 Analytics & Monitoring**: Comprehensive usage tracking and performance analytics
+- **🌐 Puter.js Integration**: Cloud storage and advanced AI services integration
+- **🔒 Security First**: Built-in security scanning and credential analysis
+- **⚡ Performance Optimized**: Lightning-fast with Rust backend and React frontend
+
+Think of Claudia Ultimate as your AI command center - where cutting-edge AI meets practical development tools, investment tracking, and beautiful user experience.
 
 ## 📋 Table of Contents
 
 - [🌟 Overview](#-overview)
 - [✨ Features](#-features)
+  - [🤖 Multi-AI Service Integration](#-multi-ai-service-integration)
+  - [💰 Investment Dashboard](#-investment-dashboard)
+  - [🎨 Dynamic Theme System](#-dynamic-theme-system)
   - [🗂️ Project & Session Management](#️-project--session-management)
-  - [🤖 CC Agents](#-cc-agents)
-  
+  - [🤖 CC Agents & Automation](#-cc-agents--automation)
   - [📊 Usage Analytics Dashboard](#-usage-analytics-dashboard)
   - [🔌 MCP Server Management](#-mcp-server-management)
   - [⏰ Timeline & Checkpoints](#-timeline--checkpoints)
-  - [📝 CLAUDE.md Management](#-claudemd-management)
+  - [🌐 Puter.js Cloud Integration](#-puterjs-cloud-integration)
+  - [🔒 Security & Monitoring](#-security--monitoring)
+  - [📝 Advanced File Management](#-advanced-file-management)
 - [📖 Usage](#-usage)
-  - [Getting Started](#getting-started)
-  - [Managing Projects](#managing-projects)
-  - [Creating Agents](#creating-agents)
-  - [Tracking Usage](#tracking-usage)
-  - [Working with MCP Servers](#working-with-mcp-servers)
 - [🚀 Installation](#-installation)
 - [🔨 Build from Source](#-build-from-source)
 - [🛠️ Development](#️-development)
@@ -58,31 +76,70 @@ Think of Claudia as your command center for Claude Code - bridging the gap betwe
 
 ## ✨ Features
 
+### 🤖 **Multi-AI Service Integration**
+- **Claude (Anthropic)**: Full Claude Code integration with advanced reasoning
+- **ChatGPT (OpenAI)**: GPT-4 and GPT-3.5 support with custom configurations
+- **Gemini (Google)**: Google's latest AI models with multimodal capabilities
+- **Grok (xAI)**: Elon Musk's AI with real-time information access
+- **Qwen (Alibaba)**: Chinese AI model with specialized language support
+- **Ollama**: Local AI models for privacy-focused development
+- **Unified Interface**: Switch between AI services seamlessly
+- **Model Comparison**: Run the same prompt across multiple AIs
+
+### 💰 **Investment Dashboard**
+- **Real-time Portfolio Tracking**: Monitor crypto and stock investments
+- **Performance Analytics**: Detailed charts and profit/loss calculations
+- **Market Data Integration**: Live price feeds and market indicators
+- **Investment Insights**: AI-powered investment analysis and recommendations
+- **Risk Management**: Portfolio diversification and risk assessment tools
+- **Export Reports**: Generate detailed investment reports for tax purposes
+
+### 🎨 **Dynamic Theme System**
+- **AI-Specific Themes**: Unique visual themes for each AI service
+  - 🔵 **Claude Theme**: Clean, professional blue design
+  - 🟢 **ChatGPT Theme**: OpenAI's signature green and modern layout
+  - 🔴 **Gemini Theme**: Google's colorful and intuitive interface
+  - ⚫ **Grok Theme**: Dark, edgy design matching xAI's aesthetic
+  - 🌈 **Hell Gate Theme**: Ultimate dark theme with neon accents
+- **Custom Themes**: Create and share your own theme configurations
+- **Adaptive UI**: Interface adapts based on selected AI service
+- **Dark/Light Modes**: Full support for both light and dark preferences
+
 ### 🗂️ **Project & Session Management**
 - **Visual Project Browser**: Navigate through all your Claude Code projects in `~/.claude/projects/`
+- **Multi-AI Sessions**: Run sessions with different AI models simultaneously
 - **Session History**: View and resume past coding sessions with full context
 - **Smart Search**: Find projects and sessions quickly with built-in search
 - **Session Insights**: See first messages, timestamps, and session metadata at a glance
+- **Cross-Platform Sync**: Sync sessions across different devices
 
-### 🤖 **CC Agents**
+### 🤖 **CC Agents & Automation**
 - **Custom AI Agents**: Create specialized agents with custom system prompts and behaviors
 - **Agent Library**: Build a collection of purpose-built agents for different tasks
 - **Background Execution**: Run agents in separate processes for non-blocking operations
 - **Execution History**: Track all agent runs with detailed logs and performance metrics
+- **Agent Marketplace**: Share and discover community-created agents
+- **Scheduled Tasks**: Automate repetitive development tasks
+- **GitHub Integration**: Agents for code review, commit analysis, and security scanning
 
 
 
 ### 📊 **Usage Analytics Dashboard**
-- **Cost Tracking**: Monitor your Claude API usage and costs in real-time
+- **Multi-AI Cost Tracking**: Monitor usage and costs across all AI services
 - **Token Analytics**: Detailed breakdown by model, project, and time period
+- **Performance Metrics**: Response times, success rates, and quality scores
 - **Visual Charts**: Beautiful charts showing usage trends and patterns
+- **Budget Management**: Set spending limits and receive alerts
 - **Export Data**: Export usage data for accounting and analysis
+- **ROI Analysis**: Calculate return on investment for AI-assisted development
 
 ### 🔌 **MCP Server Management**
 - **Server Registry**: Manage Model Context Protocol servers from a central UI
 - **Easy Configuration**: Add servers via UI or import from existing configs
 - **Connection Testing**: Verify server connectivity before use
 - **Claude Desktop Import**: Import server configurations from Claude Desktop
+- **Custom Protocols**: Support for custom MCP implementations
+- **Load Balancing**: Distribute requests across multiple servers
 
 ### ⏰ **Timeline & Checkpoints**
 - **Session Versioning**: Create checkpoints at any point in your coding session
@@ -90,61 +147,108 @@ Think of Claudia as your command center for Claude Code - bridging the gap betwe
 - **Instant Restore**: Jump back to any checkpoint with one click
 - **Fork Sessions**: Create new branches from existing checkpoints
 - **Diff Viewer**: See exactly what changed between checkpoints
+- **Collaborative Checkpoints**: Share checkpoints with team members
 
-### 📝 **CLAUDE.md Management**
-- **Built-in Editor**: Edit CLAUDE.md files directly within the app
+### 🌐 **Puter.js Cloud Integration**
+- **Cloud Storage**: Seamless file synchronization across devices
+- **AI Service APIs**: Access to additional AI models through Puter's platform
+- **Authentication**: Secure OAuth integration with Puter services
+- **File System**: Cloud-based file operations and management
+- **OCR Services**: Optical character recognition for image processing
+- **TTS/STT**: Text-to-speech and speech-to-text capabilities
+- **Advanced Demos**: Interactive tutorials and feature demonstrations
+
+### 🔒 **Security & Monitoring**
+- **Credential Analysis**: Automated scanning for exposed API keys and secrets
+- **Security Reports**: Comprehensive security assessment of your projects
+- **Vulnerability Detection**: Real-time scanning for security vulnerabilities
+- **Compliance Checking**: Ensure code meets security standards
+- **Audit Logs**: Detailed logging of all system activities
+- **Encrypted Storage**: All sensitive data encrypted at rest
+
+### 📝 **Advanced File Management**
+- **Built-in Editor**: Edit CLAUDE.md and other files directly within the app
 - **Live Preview**: See your markdown rendered in real-time
-- **Project Scanner**: Find all CLAUDE.md files in your projects
-- **Syntax Highlighting**: Full markdown support with syntax highlighting
+- **Project Scanner**: Find all relevant files in your projects
+- **Syntax Highlighting**: Full syntax support for multiple programming languages
+- **File Templates**: Pre-built templates for common file types
+- **Version Control**: Git integration with visual diff and merge tools
 
 ## 📖 Usage
 
-### Getting Started
+### 🚀 Getting Started
 
-1. **Launch Claudia**: Open the application after installation
-2. **Welcome Screen**: Choose between CC Agents or CC Projects
-3. **First Time Setup**: Claudia will automatically detect your `~/.claude` directory
+1. **Launch Claudia Ultimate**: Open the application after installation
+2. **Choose Your AI Service**: Select from Claude, ChatGPT, Gemini, Grok, Qwen, or Ollama
+3. **Configure API Keys**: Set up your API keys for the AI services you want to use
+4. **Select Theme**: Choose a theme that matches your preferred AI service
+5. **Start Creating**: Begin your AI-powered development journey
 
-### Managing Projects
-
-```
-CC Projects → Select Project → View Sessions → Resume or Start New
-```
-
-- Click on any project to view its sessions
-- Each session shows the first message and timestamp
-- Resume sessions directly or start new ones
-
-### Creating Agents
+### 🤖 Multi-AI Workflow
 
 ```
-CC Agents → Create Agent → Configure → Execute
+AI Service Selection → Configure Settings → Start Session → Switch Models Seamlessly
 ```
 
-1. **Design Your Agent**: Set name, icon, and system prompt
-2. **Configure Model**: Choose between available Claude models
-3. **Set Permissions**: Configure file read/write and network access
-4. **Execute Tasks**: Run your agent on any project
+- **Service Switching**: Change AI services without losing context
+- **Model Comparison**: Run the same prompt across multiple AIs
+- **Unified History**: All conversations saved regardless of AI service
+- **Cross-Service Learning**: Leverage strengths of different AI models
 
-### Tracking Usage
-
-```
-Menu → Usage Dashboard → View Analytics
-```
-
-- Monitor costs by model, project, and date
-- Export data for reports
-- Set up usage alerts (coming soon)
-
-### Working with MCP Servers
+### 💰 Investment Tracking
 
 ```
-Menu → MCP Manager → Add Server → Configure
+Dashboard → Add Portfolio → Connect APIs → Monitor Performance
 ```
 
-- Add servers manually or via JSON
-- Import from Claude Desktop configuration
-- Test connections before using
+1. **Portfolio Setup**: Add your crypto and stock holdings
+2. **API Integration**: Connect to exchanges and brokers for real-time data
+3. **Performance Analysis**: View detailed charts and analytics
+4. **AI Insights**: Get AI-powered investment recommendations
+
+### 🎨 Theme Customization
+
+```
+Settings → Themes → Select AI Service → Customize Colors → Apply
+```
+
+- **Pre-built Themes**: Choose from AI-specific themes
+- **Custom Colors**: Create your own color schemes
+- **Dynamic Switching**: Themes change automatically with AI service
+- **Export/Import**: Share themes with the community
+
+### 🔧 Agent Management
+
+```
+CC Agents → Create Agent → Configure Behavior → Deploy → Monitor
+```
+
+1. **Agent Design**: Set name, icon, and specialized prompts
+2. **Capability Configuration**: Define file access and network permissions
+3. **Deployment**: Run agents in background or on-demand
+4. **Performance Monitoring**: Track agent effectiveness and costs
+
+### 📊 Analytics & Monitoring
+
+```
+Menu → Analytics Dashboard → Select Timeframe → View Reports → Export Data
+```
+
+- **Usage Tracking**: Monitor API calls across all services
+- **Cost Analysis**: Track spending by service and project
+- **Performance Metrics**: Analyze response times and quality
+- **Budget Alerts**: Set spending limits and receive notifications
+
+### 🌐 Cloud Integration
+
+```
+Settings → Puter Integration → Authenticate → Sync Files → Access Cloud Services
+```
+
+- **File Synchronization**: Keep projects synced across devices
+- **Cloud AI Services**: Access additional AI models through Puter
+- **Collaborative Features**: Share projects and checkpoints
+- **Advanced Tools**: Use OCR, TTS, and other cloud services
 
 ## 🚀 Installation
 
