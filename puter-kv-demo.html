@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puter.js 键值存储演示 - DynamoDB 免费替代方案</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a0a0a 50%, #2d1b1b 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(45deg, #8B0000, #DC143C, #B22222);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(220, 20, 60, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #DC143C, transparent);
+            transition: left 0.5s ease;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(220, 20, 60, 0.2);
+            border-color: #DC143C;
+        }
+
+        .card h3 {
+            color: #DC143C;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3::before {
+            content: '🔥';
+            font-size: 1.2em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #DC143C;
+            box-shadow: 0 0 10px rgba(220, 20, 60, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #444, #666);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #8B0000, #FF0000);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #006400, #32CD32);
+        }
+
+        .result-area {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 4px;
+            border-left: 3px solid #DC143C;
+            background: rgba(220, 20, 60, 0.1);
+        }
+
+        .log-entry.success {
+            border-left-color: #32CD32;
+            background: rgba(50, 205, 50, 0.1);
+        }
+
+        .log-entry.error {
+            border-left-color: #FF0000;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .timestamp {
+            color: #888;
+            font-size: 11px;
+        }
+
+        .counter-display {
+            font-size: 3em;
+            font-weight: bold;
+            text-align: center;
+            color: #DC143C;
+            text-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+            margin: 20px 0;
+            padding: 20px;
+            background: radial-gradient(circle, rgba(220, 20, 60, 0.1), transparent);
+            border-radius: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #DC143C;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #ccc;
+            margin-top: 5px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        .data-table th {
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            color: white;
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background: rgba(220, 20, 60, 0.1);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #DC143C;
+            box-shadow: 0 0 10px rgba(220, 20, 60, 0.3);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #444;
+            border-radius: 50%;
+            border-top-color: #DC143C;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: linear-gradient(45deg, #006400, #32CD32);
+        }
+
+        .toast.error {
+            background: linear-gradient(45deg, #8B0000, #FF0000);
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .counter-display {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Puter.js 键值存储演示</h1>
+            <p>DynamoDB 的免费替代方案 - 零配置，无限制的键值存储</p>
+        </div>
+
+        <div class="grid">
+            <!-- 基本键值操作 -->
+            <div class="card">
+                <h3>基本键值操作</h3>
+                <div class="form-group">
+                    <label for="basic-key">键 (Key)</label>
+                    <input type="text" id="basic-key" placeholder="输入键名">
+                </div>
+                <div class="form-group">
+                    <label for="basic-value">值 (Value)</label>
+                    <textarea id="basic-value" rows="3" placeholder="输入值"></textarea>
+                </div>
+                <div>
+                    <button class="btn" onclick="setValue()">设置值</button>
+                    <button class="btn btn-secondary" onclick="getValue()">获取值</button>
+                    <button class="btn btn-danger" onclick="deleteValue()">删除值</button>
+                </div>
+                <div class="result-area" id="basic-result"></div>
+            </div>
+
+            <!-- 用户配置文件管理器 -->
+            <div class="card">
+                <h3>用户配置文件管理器</h3>
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" placeholder="输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" placeholder="输入邮箱">
+                </div>
+                <div class="form-group">
+                    <label for="age">年龄</label>
+                    <input type="number" id="age" placeholder="输入年龄">
+                </div>
+                <div>
+                    <button class="btn" onclick="saveProfile()">保存配置文件</button>
+                    <button class="btn btn-secondary" onclick="loadProfile()">加载配置文件</button>
+                    <button class="btn btn-secondary" onclick="listProfiles()">列出所有配置文件</button>
+                </div>
+                <div class="result-area" id="profile-result"></div>
+            </div>
+
+            <!-- 产品库存管理 -->
+            <div class="card">
+                <h3>产品库存管理</h3>
+                <div class="form-group">
+                    <label for="product-name">产品名称</label>
+                    <input type="text" id="product-name" placeholder="输入产品名称">
+                </div>
+                <div class="form-group">
+                    <label for="product-price">价格</label>
+                    <input type="number" id="product-price" step="0.01" placeholder="输入价格">
+                </div>
+                <div class="form-group">
+                    <label for="product-stock">库存</label>
+                    <input type="number" id="product-stock" placeholder="输入库存数量">
+                </div>
+                <div>
+                    <button class="btn" onclick="addProduct()">添加产品</button>
+                    <button class="btn btn-secondary" onclick="listProducts()">列出产品</button>
+                    <button class="btn btn-danger" onclick="clearInventory()">清空库存</button>
+                </div>
+                <div class="result-area" id="product-result"></div>
+            </div>
+
+            <!-- 原子操作计数器 -->
+            <div class="card">
+                <h3>原子操作计数器</h3>
+                <div class="counter-display" id="visit-counter">0</div>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="incrementCounter('visit_count', 'visit-counter')">访问计数 +1</button>
+                    <button class="btn" onclick="incrementCounter('click_count', 'click-counter')">点击计数 +1</button>
+                    <button class="btn btn-danger" onclick="resetCounters()">重置计数器</button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="click-counter">0</span>
+                        <div class="stat-label">点击次数</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-operations">0</span>
+                        <div class="stat-label">总操作数</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据浏览器 -->
+            <div class="card full-width">
+                <h3>数据浏览器</h3>
+                <input type="text" class="search-box" id="search-filter" placeholder="搜索键名或值..." onkeyup="filterData()">
+                <div>
+                    <button class="btn" onclick="refreshDataBrowser()">刷新数据</button>
+                    <button class="btn btn-secondary" onclick="exportData()">导出数据</button>
+                    <button class="btn btn-secondary" onclick="importData()">导入数据</button>
+                    <button class="btn btn-danger" onclick="clearAllData()">清空所有数据</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="data-table">
+                        <thead>
+                            <tr>
+                                <th>键名</th>
+                                <th>值</th>
+                                <th>类型</th>
+                                <th>大小</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 统计信息 -->
+            <div class="card full-width">
+                <h3>统计信息</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-keys">0</span>
+                        <div class="stat-label">总键数</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-size">0</span>
+                        <div class="stat-label">数据大小 (字节)</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="user-profiles">0</span>
+                        <div class="stat-label">用户配置文件</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="products-count">0</span>
+                        <div class="stat-label">产品数量</div>
+                    </div>
+                </div>
+                <div class="result-area" id="operation-log"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let operationCount = 0;
+        let allData = [];
+
+        // 工具函数
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        function logOperation(operation, result, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `
+                <div class="timestamp">${timestamp}</div>
+                <div><strong>${operation}:</strong> ${result}</div>
+            `;
+            
+            const logContainer = document.getElementById('operation-log');
+            logContainer.insertBefore(logEntry, logContainer.firstChild);
+            
+            // 限制日志条目数量
+            while (logContainer.children.length > 50) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+            
+            operationCount++;
+            document.getElementById('total-operations').textContent = operationCount;
+        }
+
+        function updateResult(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `
+                <div class="timestamp">${timestamp}</div>
+                <div>${content}</div>
+            `;
+            element.insertBefore(entry, element.firstChild);
+            
+            // 限制显示条目数量
+            while (element.children.length > 10) {
+                element.removeChild(element.lastChild);
+            }
+        }
+
+        // 基本键值操作
+        async function setValue() {
+            const key = document.getElementById('basic-key').value.trim();
+            const value = document.getElementById('basic-value').value;
+            
+            if (!key) {
+                showToast('请输入键名', 'error');
+                return;
+            }
+            
+            try {
+                await puter.kv.set(key, value);
+                updateResult('basic-result', `✅ 成功设置: ${key} = ${value}`, 'success');
+                logOperation('设置值', `${key} = ${value}`, 'success');
+                showToast('值设置成功');
+                refreshDataBrowser();
+            } catch (error) {
+                updateResult('basic-result', `❌ 设置失败: ${error.message}`, 'error');
+                logOperation('设置值', `失败: ${error.message}`, 'error');
+                showToast('设置失败', 'error');
+            }
+        }
+
+        async function getValue() {
+            const key = document.getElementById('basic-key').value.trim();
+            
+            if (!key) {
+                showToast('请输入键名', 'error');
+                return;
+            }
+            
+            try {
+                const value = await puter.kv.get(key);
+                if (value !== null) {
+                    updateResult('basic-result', `✅ 获取成功: ${key} = ${value}`, 'success');
+                    logOperation('获取值', `${key} = ${value}`, 'success');
+                    document.getElementById('basic-value').value = value;
+                } else {
+                    updateResult('basic-result', `⚠️ 键不存在: ${key}`, 'error');
+                    logOperation('获取值', `键不存在: ${key}`, 'error');
+                }
+            } catch (error) {
+                updateResult('basic-result', `❌ 获取失败: ${error.message}`, 'error');
+                logOperation('获取值', `失败: ${error.message}`, 'error');
+                showToast('获取失败', 'error');
+            }
+        }
+
+        async function deleteValue() {
+            const key = document.getElementById('basic-key').value.trim();
+            
+            if (!key) {
+                showToast('请输入键名', 'error');
+                return;
+            }
+            
+            try {
+                await puter.kv.del(key);
+                updateResult('basic-result', `✅ 删除成功: ${key}`, 'success');
+                logOperation('删除值', key, 'success');
+                showToast('值删除成功');
+                document.getElementById('basic-value').value = '';
+                refreshDataBrowser();
+            } catch (error) {
+                updateResult('basic-result', `❌ 删除失败: ${error.message}`, 'error');
+                logOperation('删除值', `失败: ${error.message}`, 'error');
+                showToast('删除失败', 'error');
+            }
+        }
+
+        // 用户配置文件管理
+        async function saveProfile() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const age = document.getElementById('age').value;
+            
+            if (!username || !email || !age) {
+                showToast('请填写所有字段', 'error');
+                return;
+            }
+            
+            const profile = { email, age, createdAt: new Date().toISOString() };
+            
+            try {
+                await puter.kv.set(`user:${username}`, JSON.stringify(profile));
+                updateResult('profile-result', `✅ 配置文件已保存: ${username}`, 'success');
+                logOperation('保存配置文件', username, 'success');
+                showToast('配置文件保存成功');
+                refreshDataBrowser();
+            } catch (error) {
+                updateResult('profile-result', `❌ 保存失败: ${error.message}`, 'error');
+                logOperation('保存配置文件', `失败: ${error.message}`, 'error');
+                showToast('保存失败', 'error');
+            }
+        }
+
+        async function loadProfile() {
+            const username = document.getElementById('username').value.trim();
+            
+            if (!username) {
+                showToast('请输入用户名', 'error');
+                return;
+            }
+            
+            try {
+                const profileJson = await puter.kv.get(`user:${username}`);
+                if (profileJson) {
+                    const profile = JSON.parse(profileJson);
+                    document.getElementById('email').value = profile.email;
+                    document.getElementById('age').value = profile.age;
+                    updateResult('profile-result', `✅ 配置文件已加载: ${username}`, 'success');
+                    logOperation('加载配置文件', username, 'success');
+                    showToast('配置文件加载成功');
+                } else {
+                    updateResult('profile-result', `⚠️ 配置文件不存在: ${username}`, 'error');
+                    logOperation('加载配置文件', `不存在: ${username}`, 'error');
+                }
+            } catch (error) {
+                updateResult('profile-result', `❌ 加载失败: ${error.message}`, 'error');
+                logOperation('加载配置文件', `失败: ${error.message}`, 'error');
+                showToast('加载失败', 'error');
+            }
+        }
+
+        async function listProfiles() {
+            try {
+                const profiles = await puter.kv.list('user:*', true);
+                if (profiles.length > 0) {
+                    let result = '📋 用户配置文件列表:<br>';
+                    profiles.forEach(profile => {
+                        const username = profile.key.split(':')[1];
+                        const data = JSON.parse(profile.value);
+                        result += `• ${username} (${data.email}, ${data.age}岁)<br>`;
+                    });
+                    updateResult('profile-result', result, 'success');
+                    logOperation('列出配置文件', `找到 ${profiles.length} 个配置文件`, 'success');
+                } else {
+                    updateResult('profile-result', '📋 没有找到用户配置文件', 'info');
+                    logOperation('列出配置文件', '没有找到配置文件', 'info');
+                }
+            } catch (error) {
+                updateResult('profile-result', `❌ 列出失败: ${error.message}`, 'error');
+                logOperation('列出配置文件', `失败: ${error.message}`, 'error');
+                showToast('列出失败', 'error');
+            }
+        }
+
+        // 产品库存管理
+        async function addProduct() {
+            const name = document.getElementById('product-name').value.trim();
+            const price = document.getElementById('product-price').value;
+            const stock = document.getElementById('product-stock').value;
+            
+            if (!name || !price || !stock) {
+                showToast('请填写所有字段', 'error');
+                return;
+            }
+            
+            const product = { 
+                price: parseFloat(price), 
+                stock: parseInt(stock),
+                addedAt: new Date().toISOString()
+            };
+            
+            try {
+                await puter.kv.set(`product:${name}`, JSON.stringify(product));
+                updateResult('product-result', `✅ 产品已添加: ${name} ($${price}, 库存: ${stock})`, 'success');
+                logOperation('添加产品', `${name} - $${price}`, 'success');
+                showToast('产品添加成功');
+                
+                // 清空表单
+                document.getElementById('product-name').value = '';
+                document.getElementById('product-price').value = '';
+                document.getElementById('product-stock').value = '';
+                
+                refreshDataBrowser();
+            } catch (error) {
+                updateResult('product-result', `❌ 添加失败: ${error.message}`, 'error');
+                logOperation('添加产品', `失败: ${error.message}`, 'error');
+                showToast('添加失败', 'error');
+            }
+        }
+
+        async function listProducts() {
+            try {
+                const products = await puter.kv.list('product:*', true);
+                if (products.length > 0) {
+                    let result = '🛍️ 产品库存列表:<br>';
+                    let totalValue = 0;
+                    products.forEach(product => {
+                        const name = product.key.split(':')[1];
+                        const data = JSON.parse(product.value);
+                        const value = data.price * data.stock;
+                        totalValue += value;
+                        result += `• ${name}: $${data.price} × ${data.stock} = $${value.toFixed(2)}<br>`;
+                    });
+                    result += `<br><strong>总价值: $${totalValue.toFixed(2)}</strong>`;
+                    updateResult('product-result', result, 'success');
+                    logOperation('列出产品', `找到 ${products.length} 个产品`, 'success');
+                } else {
+                    updateResult('product-result', '🛍️ 库存为空', 'info');
+                    logOperation('列出产品', '库存为空', 'info');
+                }
+            } catch (error) {
+                updateResult('product-result', `❌ 列出失败: ${error.message}`, 'error');
+                logOperation('列出产品', `失败: ${error.message}`, 'error');
+                showToast('列出失败', 'error');
+            }
+        }
+
+        async function clearInventory() {
+            if (!confirm('确定要清空所有产品库存吗？')) {
+                return;
+            }
+            
+            try {
+                const products = await puter.kv.list('product:*');
+                for (const key of products) {
+                    await puter.kv.del(key);
+                }
+                updateResult('product-result', `✅ 库存已清空 (删除了 ${products.length} 个产品)`, 'success');
+                logOperation('清空库存', `删除了 ${products.length} 个产品`, 'success');
+                showToast('库存清空成功');
+                refreshDataBrowser();
+            } catch (error) {
+                updateResult('product-result', `❌ 清空失败: ${error.message}`, 'error');
+                logOperation('清空库存', `失败: ${error.message}`, 'error');
+                showToast('清空失败', 'error');
+            }
+        }
+
+        // 原子操作计数器
+        async function incrementCounter(counterKey, displayId) {
+            try {
+                const count = await puter.kv.incr(counterKey);
+                document.getElementById(displayId).textContent = count;
+                logOperation('增加计数器', `${counterKey} = ${count}`, 'success');
+                showToast(`计数器增加: ${count}`);
+            } catch (error) {
+                logOperation('增加计数器', `失败: ${error.message}`, 'error');
+                showToast('计数器增加失败', 'error');
+            }
+        }
+
+        async function resetCounters() {
+            if (!confirm('确定要重置所有计数器吗？')) {
+                return;
+            }
+            
+            try {
+                await puter.kv.set('visit_count', '0');
+                await puter.kv.set('click_count', '0');
+                document.getElementById('visit-counter').textContent = '0';
+                document.getElementById('click-counter').textContent = '0';
+                logOperation('重置计数器', '所有计数器已重置', 'success');
+                showToast('计数器重置成功');
+            } catch (error) {
+                logOperation('重置计数器', `失败: ${error.message}`, 'error');
+                showToast('重置失败', 'error');
+            }
+        }
+
+        // 数据浏览器
+        async function refreshDataBrowser() {
+            try {
+                const keys = await puter.kv.list('*');
+                allData = [];
+                
+                for (const key of keys) {
+                    try {
+                        const value = await puter.kv.get(key);
+                        if (value !== null) {
+                            allData.push({
+                                key: key,
+                                value: value,
+                                type: typeof value,
+                                size: new Blob([value]).size
+                            });
+                        }
+                    } catch (error) {
+                        console.warn(`无法获取键 ${key} 的值:`, error);
+                    }
+                }
+                
+                displayData(allData);
+                updateStatistics();
+                logOperation('刷新数据浏览器', `加载了 ${allData.length} 个键值对`, 'success');
+            } catch (error) {
+                logOperation('刷新数据浏览器', `失败: ${error.message}`, 'error');
+                showToast('刷新失败', 'error');
+            }
+        }
+
+        function displayData(data) {
+            const tbody = document.getElementById('data-table-body');
+            tbody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                const displayValue = item.value.length > 50 ? 
+                    item.value.substring(0, 50) + '...' : item.value;
+                
+                row.innerHTML = `
+                    <td>${item.key}</td>
+                    <td title="${item.value}">${displayValue}</td>
+                    <td>${item.type}</td>
+                    <td>${item.size} 字节</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="editData('${item.key}')">编辑</button>
+                        <button class="btn btn-danger" onclick="deleteData('${item.key}')">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterData() {
+            const filter = document.getElementById('search-filter').value.toLowerCase();
+            const filteredData = allData.filter(item => 
+                item.key.toLowerCase().includes(filter) || 
+                item.value.toLowerCase().includes(filter)
+            );
+            displayData(filteredData);
+        }
+
+        async function editData(key) {
+            const newValue = prompt(`编辑键 "${key}" 的值:`, await puter.kv.get(key));
+            if (newValue !== null) {
+                try {
+                    await puter.kv.set(key, newValue);
+                    showToast('数据更新成功');
+                    refreshDataBrowser();
+                    logOperation('编辑数据', `${key} = ${newValue}`, 'success');
+                } catch (error) {
+                    showToast('更新失败', 'error');
+                    logOperation('编辑数据', `失败: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function deleteData(key) {
+            if (confirm(`确定要删除键 "${key}" 吗？`)) {
+                try {
+                    await puter.kv.del(key);
+                    showToast('数据删除成功');
+                    refreshDataBrowser();
+                    logOperation('删除数据', key, 'success');
+                } catch (error) {
+                    showToast('删除失败', 'error');
+                    logOperation('删除数据', `失败: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(allData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `puter-kv-export-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast('数据导出成功');
+            logOperation('导出数据', `导出了 ${allData.length} 个键值对`, 'success');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        const text = await file.text();
+                        const data = JSON.parse(text);
+                        
+                        for (const item of data) {
+                            await puter.kv.set(item.key, item.value);
+                        }
+                        
+                        showToast(`成功导入 ${data.length} 个键值对`);
+                        refreshDataBrowser();
+                        logOperation('导入数据', `导入了 ${data.length} 个键值对`, 'success');
+                    } catch (error) {
+                        showToast('导入失败', 'error');
+                        logOperation('导入数据', `失败: ${error.message}`, 'error');
+                    }
+                }
+            };
+            input.click();
+        }
+
+        async function clearAllData() {
+            if (!confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+                return;
+            }
+            
+            try {
+                const keys = await puter.kv.list('*');
+                for (const key of keys) {
+                    await puter.kv.del(key);
+                }
+                showToast(`成功清空 ${keys.length} 个键值对`);
+                refreshDataBrowser();
+                logOperation('清空所有数据', `删除了 ${keys.length} 个键值对`, 'success');
+            } catch (error) {
+                showToast('清空失败', 'error');
+                logOperation('清空所有数据', `失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 统计信息更新
+        function updateStatistics() {
+            document.getElementById('total-keys').textContent = allData.length;
+            
+            const totalSize = allData.reduce((sum, item) => sum + item.size, 0);
+            document.getElementById('total-size').textContent = totalSize;
+            
+            const userProfiles = allData.filter(item => item.key.startsWith('user:')).length;
+            document.getElementById('user-profiles').textContent = userProfiles;
+            
+            const products = allData.filter(item => item.key.startsWith('product:')).length;
+            document.getElementById('products-count').textContent = products;
+        }
+
+        // 初始化
+        async function initialize() {
+            try {
+                // 加载计数器
+                const visitCount = await puter.kv.get('visit_count') || '0';
+                const clickCount = await puter.kv.get('click_count') || '0';
+                document.getElementById('visit-counter').textContent = visitCount;
+                document.getElementById('click-counter').textContent = clickCount;
+                
+                // 自动增加访问计数
+                await incrementCounter('visit_count', 'visit-counter');
+                
+                // 刷新数据浏览器
+                await refreshDataBrowser();
+                
+                showToast('Puter.js 键值存储演示已就绪！');
+                logOperation('系统初始化', '演示页面已加载', 'success');
+            } catch (error) {
+                showToast('初始化失败', 'error');
+                logOperation('系统初始化', `失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initialize);
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 's':
+                        e.preventDefault();
+                        setValue();
+                        break;
+                    case 'g':
+                        e.preventDefault();
+                        getValue();
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        refreshDataBrowser();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

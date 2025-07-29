@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Loader2, Bot, FolderCode } from "lucide-react";
+import { Plus, Loader2, Bot, FolderCode, MessageCircle } from "lucide-react";
 import { api, type Project, type Session, type ClaudeMdFile } from "@/lib/api";
 import { OutputCacheProvider } from "@/lib/outputCache";
 import { TabProvider } from "@/contexts/TabContext";
@@ -24,7 +24,9 @@ import { ProjectSettings } from '@/components/ProjectSettings';
 import { TabManager } from "@/components/TabManager";
 import { TabContent } from "@/components/TabContent";
 import { AgentsModal } from "@/components/AgentsModal";
+import { MoneyMakingDashboard } from "@/components/MoneyMakingDashboard";
 import { useTabState } from "@/hooks/useTabState";
+import OllamaChat from "@/components/OllamaChat";
 
 type View = 
   | "welcome" 
@@ -40,13 +42,15 @@ type View =
   | "mcp"
   | "usage-dashboard"
   | "project-settings"
-  | "tabs"; // New view for tab-based interface
+  | "tabs"
+  | "money-making"
+  | "ollama-chat"; // New view for Ollama chat
 
 /**
  * AppContent component - Contains the main app logic, wrapped by providers
  */
 function AppContent() {
-  const [view, setView] = useState<View>("tabs");
+  const [view, setView] = useState<View>("ollama-chat");
   const { createClaudeMdTab, createSettingsTab, createUsageTab, createMCPTab } = useTabState();
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -229,12 +233,29 @@ function AppContent() {
               </motion.div>
 
               {/* Navigation Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                {/* CC Agents Card */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+                {/* Ollama Chat Card */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                  <Card 
+                    className="h-64 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg border border-border/50 shimmer-hover trailing-border"
+                    onClick={() => handleViewChange("ollama-chat")}
+                  >
+                    <div className="h-full flex flex-col items-center justify-center p-8">
+                      <MessageCircle className="h-16 w-16 mb-4 text-primary" />
+                      <h2 className="text-xl font-semibold">Ollama 聊天</h2>
+                    </div>
+                  </Card>
+                </motion.div>
+
+                {/* CC Agents Card */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
                 >
                   <Card 
                     className="h-64 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg border border-border/50 shimmer-hover trailing-border"
@@ -251,7 +272,7 @@ function AppContent() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
                 >
                   <Card 
                     className="h-64 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg border border-border/50 shimmer-hover trailing-border"
@@ -423,6 +444,13 @@ function AppContent() {
           </div>
         );
       
+      case "ollama-chat":
+        return (
+          <div className="h-full">
+            <OllamaChat />
+          </div>
+        );
+      
       case "usage-dashboard":
         return (
           <UsageDashboard onBack={() => handleViewChange("welcome")} />
@@ -447,6 +475,11 @@ function AppContent() {
         }
         break;
       
+      case "money-making":
+        return (
+          <MoneyMakingDashboard onBack={() => handleViewChange("welcome")} />
+        );
+      
       default:
         return null;
     }
@@ -462,6 +495,8 @@ function AppContent() {
         onMCPClick={() => createMCPTab()}
         onInfoClick={() => setShowNFO(true)}
         onAgentsClick={() => setShowAgentsModal(true)}
+        onOllamaChatClick={() => setView('ollama-chat')}
+        onMoneyMakingClick={() => setView('money-making')}
       />
       
       {/* Main Content */}

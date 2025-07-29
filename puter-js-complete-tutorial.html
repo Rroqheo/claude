@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puter.js 完整教程 - 从入门到精通</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, var(--primary), var(--accent));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg), #1e1b4b);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            border: 2px solid var(--primary);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--accent);
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .feature-badge {
+            background: var(--gradient);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .tutorial-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .nav-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-card:hover, .nav-card.active {
+            border-color: var(--accent);
+            background: rgba(6, 182, 212, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .nav-card h3 {
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .nav-card p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .tutorial-content {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            min-height: 600px;
+        }
+
+        .tutorial-section {
+            display: none;
+        }
+
+        .tutorial-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+        }
+
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .demo-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: var(--text);
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Fira Code', 'Courier New', monospace;
+        }
+
+        .btn {
+            background: var(--gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--secondary), var(--warning));
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success), var(--accent));
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, var(--error), #dc2626);
+        }
+
+        .output-area {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+
+        .status-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .status-item {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .status-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .message.info {
+            background: rgba(6, 182, 212, 0.1);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .code-block {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .highlight {
+            background: rgba(99, 102, 241, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .demo-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .tutorial-nav {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🚀 Puter.js 完整教程</h1>
+            <p class="subtitle">无服务器身份验证、云存储和 AI 功能的完整指南</p>
+            <div class="features">
+                <span class="feature-badge">🆓 100% 免费</span>
+                <span class="feature-badge">🔑 无需 API 密钥</span>
+                <span class="feature-badge">🤖 GPT-4o 支持</span>
+                <span class="feature-badge">☁️ 云存储</span>
+                <span class="feature-badge">🔐 自动身份验证</span>
+                <span class="feature-badge">⚡ 即插即用</span>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-value" id="authStatus">检查中...</span>
+                <span class="status-label">登录状态</span>
+            </div>
+            <div class="status-item">
+                <span class="status-value" id="requestCount">0</span>
+                <span class="status-label">API 请求</span>
+            </div>
+            <div class="status-item">
+                <span class="status-value" id="filesCount">0</span>
+                <span class="status-label">云文件</span>
+            </div>
+            <div class="status-item">
+                <span class="status-value" id="kvCount">0</span>
+                <span class="status-label">键值对</span>
+            </div>
+        </div>
+
+        <div class="tutorial-nav">
+            <div class="nav-card active" onclick="showSection('intro')">
+                <h3>📚 入门介绍</h3>
+                <p>了解 Puter.js 的基本概念和安装方法</p>
+            </div>
+            <div class="nav-card" onclick="showSection('ai-demo')">
+                <h3>🤖 AI 聊天演示</h3>
+                <p>使用 GPT-4o 进行智能对话</p>
+            </div>
+            <div class="nav-card" onclick="showSection('storage-demo')">
+                <h3>☁️ 云存储演示</h3>
+                <p>文件上传、下载和管理</p>
+            </div>
+            <div class="nav-card" onclick="showSection('kv-demo')">
+                <h3>🗃️ 键值存储</h3>
+                <p>云端数据存储和检索</p>
+            </div>
+            <div class="nav-card" onclick="showSection('auth-demo')">
+                <h3>🔐 身份验证</h3>
+                <p>用户登录和身份管理</p>
+            </div>
+            <div class="nav-card" onclick="showSection('advanced')">
+                <h3>⚡ 高级应用</h3>
+                <p>实际项目中的应用示例</p>
+            </div>
+        </div>
+
+        <div class="tutorial-content">
+            <!-- 入门介绍 -->
+            <div id="intro" class="tutorial-section active">
+                <div class="section-title">
+                    <span class="section-icon">📚</span>
+                    Puter.js 入门介绍
+                </div>
+                
+                <div class="demo-container">
+                    <div class="demo-card">
+                        <div class="card-title">🎯 什么是 Puter.js？</div>
+                        <p style="margin-bottom: 15px;">
+                            Puter.js 是一个革命性的无服务器平台，它将身份验证、云存储和 AI 功能直接集成到您的前端代码中。
+                        </p>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li>🆓 <strong>完全免费</strong> - 对应用程序和开源项目</li>
+                            <li>🔑 <strong>无需 API 密钥</strong> - 即插即用</li>
+                            <li>🤖 <strong>AI 功能</strong> - GPT-4o、Claude 等</li>
+                            <li>☁️ <strong>云存储</strong> - 文件和数据管理</li>
+                            <li>🔐 <strong>身份验证</strong> - 自动用户管理</li>
+                        </ul>
+                        <p>
+                            采用创新的"用户付费"模式，开发者无需管理 API 密钥或担心计费问题。
+                        </p>
+                    </div>
+
+                    <div class="demo-card">
+                        <div class="card-title">⚡ 快速开始</div>
+                        <p style="margin-bottom: 15px;">只需一行代码即可开始使用：</p>
+                        <div class="code-block">
+&lt;script src="https://js.puter.com/v2/"&gt;&lt;/script&gt;
+                        </div>
+                        <p style="margin-bottom: 15px;">然后就可以使用全局 <span class="highlight">puter</span> 对象：</p>
+                        <div class="code-block">
+// AI 聊天
+await puter.ai.chat('你好，世界！');
+
+// 云存储
+await puter.fs.write('file.txt', '内容');
+
+// 键值存储
+await puter.kv.set('key', 'value');
+
+// 身份验证
+const user = await puter.auth.getUser();
+                        </div>
+                        <button class="btn" onclick="testBasicConnection()">🔗 测试连接</button>
+                        <div class="output-area" id="basicOutput">点击按钮测试 Puter.js 连接...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI 演示 -->
+            <div id="ai-demo" class="tutorial-section">
+                <div class="section-title">
+                    <span class="section-icon">🤖</span>
+                    AI 聊天演示
+                </div>
+                
+                <div class="demo-container">
+                    <div class="demo-card">
+                        <div class="card-title">💬 GPT-4o 智能对话</div>
+                        <div class="form-group">
+                            <label class="form-label">输入您的问题：</label>
+                            <textarea 
+                                class="form-input form-textarea" 
+                                id="aiPrompt" 
+                                placeholder="例如：解释什么是量子计算"
+                            >为什么鸡要过马路？</textarea>
+                        </div>
+                        <button class="btn" onclick="chatWithAI()">🚀 开始对话</button>
+                        <button class="btn btn-secondary" onclick="clearAIOutput()">🗑️ 清空</button>
+                        <div class="output-area" id="aiOutput">等待 AI 响应...</div>
+                    </div>
+
+                    <div class="demo-card">
+                        <div class="card-title">📝 代码示例</div>
+                        <p style="margin-bottom: 15px;">使用 Puter.js 调用 AI 非常简单：</p>
+                        <div class="code-block">
+// 基本用法
+const response = await puter.ai.chat('你的问题');
+console.log(response);
+
+// 使用回调
+puter.ai.chat('你的问题', (response) => {
+    console.log('AI 回复:', response);
+});
+
+// 错误处理
+try {
+    const response = await puter.ai.chat('你的问题');
+    console.log(response);
+} catch (error) {
+    console.error('AI 调用失败:', error);
+}
+                        </div>
+                        <button class="btn btn-success" onclick="runAIExample()">▶️ 运行示例</button>
+                        <div class="output-area" id="aiExampleOutput">点击运行示例代码...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 云存储演示 -->
+            <div id="storage-demo" class="tutorial-section">
+                <div class="section-title">
+                    <span class="section-icon">☁️</span>
+                    云存储演示
+                </div>
+                
+                <div class="demo-container">
+                    <div class="demo-card">
+                        <div class="card-title">📁 文件操作</div>
+                        <div class="form-group">
+                            <label class="form-label">文件名：</label>
+                            <input 
+                                class="form-input" 
+                                id="fileName" 
+                                placeholder="例如：my-file.txt"
+                                value="hello-puter.txt"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">文件内容：</label>
+                            <textarea 
+                                class="form-input form-textarea" 
+                                id="fileContent" 
+                                placeholder="输入文件内容..."
+                            >Hello, Puter.js!
+这是我的第一个云文件。
+
+功能特点：
+✅ 免费云存储
+✅ 实时同步
+✅ 跨设备访问
+✅ 自动备份</textarea>
+                        </div>
+                        <button class="btn" onclick="saveFile()">💾 保存文件</button>
+                        <button class="btn btn-secondary" onclick="loadFile()">📖 读取文件</button>
+                        <button class="btn btn-success" onclick="listFiles()">📋 文件列表</button>
+                        <div class="output-area" id="fileOutput">等待文件操作...</div>
+                    </div>
+
+                    <div class="demo-card">
+                        <div class="card-title">📋 代码示例</div>
+                        <div class="code-block">
+// 写入文件
+await puter.fs.write('filename.txt', 'content');
+
+// 读取文件
+const file = await puter.fs.read('filename.txt');
+const content = await file.text();
+
+// 列出文件
+const files = await puter.fs.readdir('/');
+
+// 删除文件
+await puter.fs.remove('filename.txt');
+
+// 创建目录
+await puter.fs.mkdir('my-folder');
+                        </div>
+                        <button class="btn btn-success" onclick="runStorageExample()">▶️ 运行示例</button>
+                        <div class="output-area" id="storageExampleOutput">点击运行存储示例...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 键值存储演示 -->
+            <div id="kv-demo" class="tutorial-section">
+                <div class="section-title">
+                    <span class="section-icon">🗃️</span>
+                    键值存储演示
+                </div>
+                
+                <div class="demo-container">
+                    <div class="demo-card">
+                        <div class="card-title">🔑 数据存储</div>
+                        <div class="form-group">
+                            <label class="form-label">键名：</label>
+                            <input 
+                                class="form-input" 
+                                id="kvKey" 
+                                placeholder="例如：user_settings"
+                                value="app_config"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">值：</label>
+                            <textarea 
+                                class="form-input form-textarea" 
+                                id="kvValue" 
+                                placeholder="可以是文本、JSON 等..."
+                            >{"theme": "dark", "language": "zh-CN", "notifications": true, "version": "1.0.0"}</textarea>
+                        </div>
+                        <button class="btn" onclick="setKVPair()">💾 保存</button>
+                        <button class="btn btn-secondary" onclick="getKVPair()">🔍 获取</button>
+                        <button class="btn btn-danger" onclick="deleteKVPair()">🗑️ 删除</button>
+                        <div class="output-area" id="kvOutput">等待键值操作...</div>
+                    </div>
+
+                    <div class="demo-card">
+                        <div class="card-title">💡 实用示例</div>
+                        <button class="btn btn-success" onclick="saveUserPreferences()">👤 用户偏好</button>
+                        <button class="btn btn-success" onclick="saveGameData()">🎮 游戏数据</button>
+                        <button class="btn btn-success" onclick="saveAppSettings()">⚙️ 应用设置</button>
+                        <div class="code-block">
+// 保存用户偏好
+await puter.kv.set('user_prefs', JSON.stringify({
+    theme: 'dark',
+    language: 'zh-CN'
+}));
+
+// 获取数据
+const prefs = await puter.kv.get('user_prefs');
+const data = JSON.parse(prefs);
+
+// 删除数据
+await puter.kv.del('old_key');
+                        </div>
+                        <div class="output-area" id="kvExampleOutput">点击按钮查看示例...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 身份验证演示 -->
+            <div id="auth-demo" class="tutorial-section">
+                <div class="section-title">
+                    <span class="section-icon">🔐</span>
+                    身份验证演示
+                </div>
+                
+                <div class="demo-container">
+                    <div class="demo-card">
+                        <div class="card-title">👤 用户认证</div>
+                        <p style="margin-bottom: 20px;">
+                            Puter.js 自动处理身份验证。当您访问云服务时，如果未登录会自动提示登录。
+                        </p>
+                        <button class="btn" onclick="checkAuthStatus()">🔍 检查状态</button>
+                        <button class="btn btn-success" onclick="signInUser()">🚪 登录</button>
+                        <button class="btn btn-secondary" onclick="signOutUser()">🚪 登出</button>
+                        <button class="btn btn-success" onclick="getUserInfo()">👤 用户信息</button>
+                        <div class="output-area" id="authOutput">等待身份验证操作...</div>
+                    </div>
+
+                    <div class="demo-card">
+                        <div class="card-title">📋 认证 API</div>
+                        <div class="code-block">
+// 检查登录状态
+const isSignedIn = puter.auth.isSignedIn();
+
+// 触发登录
+await puter.auth.signIn();
+
+// 获取用户信息
+const user = await puter.auth.getUser();
+console.log(user.username, user.email);
+
+// 登出
+await puter.auth.signOut();
+
+// 自动认证示例
+try {
+    await puter.fs.write('test.txt', 'content');
+    // 如果未登录，会自动提示登录
+} catch (error) {
+    console.log('需要登录');
+}
+                        </div>
+                        <button class="btn btn-success" onclick="runAuthExample()">▶️ 运行示例</button>
+                        <div class="output-area" id="authExampleOutput">点击运行认证示例...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 高级应用 -->
+            <div id="advanced" class="tutorial-section">
+                <div class="section-title">
+                    <span class="section-icon">⚡</span>
+                    高级应用示例
+                </div>
+                
+                <div class="demo-container">
+                    <div class="demo-card">
+                        <div class="card-title">📝 智能笔记应用</div>
+                        <div class="form-group">
+                            <label class="form-label">笔记标题：</label>
+                            <input class="form-input" id="noteTitle" placeholder="输入笔记标题">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">笔记内容：</label>
+                            <textarea class="form-input form-textarea" id="noteContent" placeholder="输入笔记内容..."></textarea>
+                        </div>
+                        <button class="btn" onclick="saveNote()">💾 保存笔记</button>
+                        <button class="btn btn-secondary" onclick="loadNotes()">📋 加载笔记</button>
+                        <button class="btn btn-success" onclick="aiSummarizeNote()">🤖 AI 总结</button>
+                        <div class="output-area" id="noteOutput">等待笔记操作...</div>
+                    </div>
+
+                    <div class="demo-card">
+                        <div class="card-title">🎯 完整应用示例</div>
+                        <p style="margin-bottom: 15px;">构建一个完整的 Web 应用：</p>
+                        <div class="code-block">
+class PuterApp {
+    constructor() {
+        this.init();
+    }
+    
+    async init() {
+        // 检查登录状态
+        if (!puter.auth.isSignedIn()) {
+            await puter.auth.signIn();
+        }
+        
+        // 加载用户设置
+        await this.loadSettings();
+        
+        // 初始化 UI
+        this.setupUI();
+    }
+    
+    async loadSettings() {
+        try {
+            const settings = await puter.kv.get('app_settings');
+            this.settings = JSON.parse(settings || '{}');
+        } catch (error) {
+            this.settings = { theme: 'dark' };
+        }
+    }
+    
+    async saveData(key, data) {
+        await puter.fs.write(`${key}.json`, 
+            JSON.stringify(data, null, 2));
+    }
+    
+    async askAI(question) {
+        return await puter.ai.chat(question);
+    }
+}
+
+// 使用应用
+const app = new PuterApp();
+                        </div>
+                        <button class="btn btn-success" onclick="runAdvancedExample()">🚀 运行完整示例</button>
+                        <div class="output-area" id="advancedOutput">点击运行高级示例...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局状态
+        let stats = {
+            requests: 0,
+            files: 0,
+            kvPairs: 0
+        };
+
+        // 更新统计
+        function updateStats() {
+            document.getElementById('requestCount').textContent = stats.requests;
+            document.getElementById('filesCount').textContent = stats.files;
+            document.getElementById('kvCount').textContent = stats.kvPairs;
+        }
+
+        function incrementRequests() {
+            stats.requests++;
+            updateStats();
+        }
+
+        // 显示消息
+        function showMessage(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `[${timestamp}] ${message}`;
+            element.innerHTML = '';
+            element.appendChild(messageDiv);
+        }
+
+        function showLoading(elementId, message = '处理中...') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="loading"><div class="spinner"></div>${message}</div>`;
+        }
+
+        // 切换教程区域
+        function showSection(sectionId) {
+            // 隐藏所有区域
+            document.querySelectorAll('.tutorial-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 移除所有导航卡片的激活状态
+            document.querySelectorAll('.nav-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // 显示选中区域
+            document.getElementById(sectionId).classList.add('active');
+            
+            // 激活对应导航卡片
+            event.target.closest('.nav-card').classList.add('active');
+        }
+
+        // 基础连接测试
+        async function testBasicConnection() {
+            showLoading('basicOutput', '测试 Puter.js 连接...');
+            incrementRequests();
+
+            try {
+                // 测试基本功能
+                const testMessage = `Puter.js 连接测试 - ${new Date().toLocaleString()}`;
+                showMessage('basicOutput', `✅ Puter.js 连接成功！\n\n测试时间: ${testMessage}\n\n可用功能:\n- AI 聊天 (puter.ai.chat)\n- 云存储 (puter.fs)\n- 键值存储 (puter.kv)\n- 身份验证 (puter.auth)`, 'success');
+            } catch (error) {
+                showMessage('basicOutput', `❌ 连接失败: ${error.message}`, 'error');
+            }
+        }
+
+        // AI 聊天功能
+        async function chatWithAI() {
+            const prompt = document.getElementById('aiPrompt').value.trim();
+            if (!prompt) {
+                showMessage('aiOutput', '请输入问题！', 'error');
+                return;
+            }
+
+            showLoading('aiOutput', '正在与 GPT-4o 对话...');
+            incrementRequests();
+
+            try {
+                const response = await puter.ai.chat(prompt);
+                showMessage('aiOutput', `🤖 AI 回复:\n\n${response}`, 'success');
+            } catch (error) {
+                showMessage('aiOutput', `❌ AI 对话失败: ${error.message}`, 'error');
+            }
+        }
+
+        function clearAIOutput() {
+            document.getElementById('aiOutput').textContent = '等待 AI 响应...';
+        }
+
+        async function runAIExample() {
+            showLoading('aiExampleOutput', '运行 AI 示例...');
+            incrementRequests();
+
+            try {
+                const examples = [
+                    '你好，Puter.js！',
+                    '解释一下什么是无服务器架构',
+                    '给我一个 JavaScript 的小技巧'
+                ];
+                
+                const randomExample = examples[Math.floor(Math.random() * examples.length)];
+                const response = await puter.ai.chat(randomExample);
+                
+                showMessage('aiExampleOutput', `📝 示例问题: ${randomExample}\n\n🤖 AI 回复:\n${response}`, 'success');
+            } catch (error) {
+                showMessage('aiExampleOutput', `❌ 示例运行失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 文件存储功能
+        async function saveFile() {
+            const fileName = document.getElementById('fileName').value.trim();
+            const fileContent = document.getElementById('fileContent').value.trim();
+            
+            if (!fileName || !fileContent) {
+                showMessage('fileOutput', '请输入文件名和内容！', 'error');
+                return;
+            }
+
+            showLoading('fileOutput', '正在保存到云端...');
+            incrementRequests();
+
+            try {
+                await puter.fs.write(fileName, fileContent);
+                stats.files++;
+                updateStats();
+                showMessage('fileOutput', `✅ 文件 "${fileName}" 已成功保存到云端！\n\n文件大小: ${fileContent.length} 字符`, 'success');
+            } catch (error) {
+                showMessage('fileOutput', `❌ 保存失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadFile() {
+            const fileName = document.getElementById('fileName').value.trim();
+            
+            if (!fileName) {
+                showMessage('fileOutput', '请输入文件名！', 'error');
+                return;
+            }
+
+            showLoading('fileOutput', '正在从云端读取...');
+            incrementRequests();
+
+            try {
+                const fileContent = await puter.fs.read(fileName);
+                const text = await fileContent.text();
+                document.getElementById('fileContent').value = text;
+                showMessage('fileOutput', `✅ 文件 "${fileName}" 已成功读取！\n\n文件大小: ${text.length} 字符`, 'success');
+            } catch (error) {
+                showMessage('fileOutput', `❌ 读取失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function listFiles() {
+            showLoading('fileOutput', '正在获取文件列表...');
+            incrementRequests();
+
+            try {
+                const files = await puter.fs.readdir('/');
+                let fileList = `📁 云端文件列表 (共 ${files.length} 个文件):\n\n`;
+                
+                if (files.length === 0) {
+                    fileList += '暂无文件';
+                } else {
+                    files.forEach((file, index) => {
+                        fileList += `${index + 1}. 📄 ${file.name}\n`;
+                    });
+                }
+                
+                showMessage('fileOutput', fileList, 'success');
+            } catch (error) {
+                showMessage('fileOutput', `❌ 获取文件列表失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function runStorageExample() {
+            showLoading('storageExampleOutput', '运行存储示例...');
+            
+            try {
+                // 创建示例文件
+                const exampleFiles = [
+                    { name: 'example1.txt', content: '这是第一个示例文件' },
+                    { name: 'example2.json', content: '{"message": "这是 JSON 文件", "timestamp": "' + new Date().toISOString() + '"}' }
+                ];
+
+                for (const file of exampleFiles) {
+                    await puter.fs.write(file.name, file.content);
+                    incrementRequests();
+                }
+
+                // 读取文件列表
+                const files = await puter.fs.readdir('/');
+                incrementRequests();
+
+                stats.files += exampleFiles.length;
+                updateStats();
+
+                showMessage('storageExampleOutput', `✅ 存储示例运行成功！\n\n创建了 ${exampleFiles.length} 个示例文件\n当前云端共有 ${files.length} 个文件`, 'success');
+            } catch (error) {
+                showMessage('storageExampleOutput', `❌ 存储示例失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 键值存储功能
+        async function setKVPair() {
+            const key = document.getElementById('kvKey').value.trim();
+            const value = document.getElementById('kvValue').value.trim();
+            
+            if (!key || !value) {
+                showMessage('kvOutput', '请输入键名和值！', 'error');
+                return;
+            }
+
+            showLoading('kvOutput', '正在保存键值对...');
+            incrementRequests();
+
+            try {
+                await puter.kv.set(key, value);
+                stats.kvPairs++;
+                updateStats();
+                showMessage('kvOutput', `✅ 键值对已保存！\n\n键: ${key}\n值: ${value.substring(0, 100)}${value.length > 100 ? '...' : ''}`, 'success');
+            } catch (error) {
+                showMessage('kvOutput', `❌ 保存失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function getKVPair() {
+            const key = document.getElementById('kvKey').value.trim();
+            
+            if (!key) {
+                showMessage('kvOutput', '请输入键名！', 'error');
+                return;
+            }
+
+            showLoading('kvOutput', '正在获取值...');
+            incrementRequests();
+
+            try {
+                const value = await puter.kv.get(key);
+                if (value !== null) {
+                    document.getElementById('kvValue').value = value;
+                    showMessage('kvOutput', `✅ 成功获取键值对！\n\n键: ${key}\n值: ${value}`, 'success');
+                } else {
+                    showMessage('kvOutput', `❌ 键 "${key}" 不存在`, 'error');
+                }
+            } catch (error) {
+                showMessage('kvOutput', `❌ 获取失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteKVPair() {
+            const key = document.getElementById('kvKey').value.trim();
+            
+            if (!key) {
+                showMessage('kvOutput', '请输入键名！', 'error');
+                return;
+            }
+
+            if (!confirm(`确定要删除键 "${key}" 吗？`)) return;
+
+            showLoading('kvOutput', '正在删除键值对...');
+            incrementRequests();
+
+            try {
+                await puter.kv.del(key);
+                stats.kvPairs = Math.max(0, stats.kvPairs - 1);
+                updateStats();
+                showMessage('kvOutput', `✅ 键 "${key}" 已删除！`, 'success');
+            } catch (error) {
+                showMessage('kvOutput', `❌ 删除失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 预设示例
+        async function saveUserPreferences() {
+            const prefs = {
+                theme: 'dark',
+                language: 'zh-CN',
+                notifications: true,
+                autoSave: true,
+                fontSize: 14
+            };
+            
+            showLoading('kvExampleOutput', '保存用户偏好...');
+            incrementRequests();
+
+            try {
+                await puter.kv.set('user_preferences', JSON.stringify(prefs));
+                stats.kvPairs++;
+                updateStats();
+                showMessage('kvExampleOutput', `✅ 用户偏好已保存！\n\n${JSON.stringify(prefs, null, 2)}`, 'success');
+            } catch (error) {
+                showMessage('kvExampleOutput', `❌ 保存失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function saveGameData() {
+            const gameData = {
+                playerName: 'Player1',
+                level: 15,
+                score: 98765,
+                achievements: ['first_win', 'speed_demon', 'perfectionist'],
+                lastPlayed: new Date().toISOString()
+            };
+            
+            showLoading('kvExampleOutput', '保存游戏数据...');
+            incrementRequests();
+
+            try {
+                await puter.kv.set('game_data', JSON.stringify(gameData));
+                stats.kvPairs++;
+                updateStats();
+                showMessage('kvExampleOutput', `✅ 游戏数据已保存！\n\n${JSON.stringify(gameData, null, 2)}`, 'success');
+            } catch (error) {
+                showMessage('kvExampleOutput', `❌ 保存失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function saveAppSettings() {
+            const settings = {
+                version: '1.0.0',
+                apiEndpoint: 'https://api.example.com',
+                maxRetries: 3,
+                timeout: 5000,
+                features: {
+                    darkMode: true,
+                    analytics: false,
+                    notifications: true
+                }
+            };
+            
+            showLoading('kvExampleOutput', '保存应用设置...');
+            incrementRequests();
+
+            try {
+                await puter.kv.set('app_settings', JSON.stringify(settings));
+                stats.kvPairs++;
+                updateStats();
+                showMessage('kvExampleOutput', `✅ 应用设置已保存！\n\n${JSON.stringify(settings, null, 2)}`, 'success');
+            } catch (error) {
+                showMessage('kvExampleOutput', `❌ 保存失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 身份验证功能
+        async function checkAuthStatus() {
+            showLoading('authOutput', '检查身份验证状态...');
+            incrementRequests();
+
+            try {
+                const isSignedIn = puter.auth.isSignedIn();
+                const status = isSignedIn ? '✅ 已登录' : '❌ 未登录';
+                showMessage('authOutput', `身份验证状态: ${status}`, 'info');
+                document.getElementById('authStatus').textContent = isSignedIn ? '已登录' : '未登录';
+            } catch (error) {
+                showMessage('authOutput', `❌ 检查失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function signInUser() {
+            showLoading('authOutput', '正在处理登录...');
+            incrementRequests();
+
+            try {
+                await puter.auth.signIn();
+                showMessage('authOutput', '✅ 用户登录成功！', 'success');
+                document.getElementById('authStatus').textContent = '已登录';
+            } catch (error) {
+                showMessage('authOutput', `❌ 登录失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function signOutUser() {
+            showLoading('authOutput', '正在登出...');
+            incrementRequests();
+
+            try {
+                await puter.auth.signOut();
+                showMessage('authOutput', '✅ 用户已登出！', 'info');
+                document.getElementById('authStatus').textContent = '未登录';
+            } catch (error) {
+                showMessage('authOutput', `❌ 登出失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function getUserInfo() {
+            showLoading('authOutput', '获取用户信息...');
+            incrementRequests();
+
+            try {
+                const user = await puter.auth.getUser();
+                showMessage('authOutput', `✅ 用户信息:\n\n${JSON.stringify(user, null, 2)}`, 'success');
+            } catch (error) {
+                showMessage('authOutput', `❌ 获取失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAuthExample() {
+            showLoading('authExampleOutput', '运行认证示例...');
+            
+            try {
+                const isSignedIn = puter.auth.isSignedIn();
+                let result = `认证状态检查: ${isSignedIn ? '已登录' : '未登录'}\n\n`;
+                
+                if (isSignedIn) {
+                    incrementRequests();
+                    const user = await puter.auth.getUser();
+                    result += `用户信息:\n${JSON.stringify(user, null, 2)}`;
+                } else {
+                    result += '提示: 点击"登录"按钮进行身份验证';
+                }
+                
+                showMessage('authExampleOutput', result, 'success');
+            } catch (error) {
+                showMessage('authExampleOutput', `❌ 认证示例失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 高级应用示例
+        async function saveNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            
+            if (!title || !content) {
+                showMessage('noteOutput', '请输入笔记标题和内容！', 'error');
+                return;
+            }
+
+            showLoading('noteOutput', '保存智能笔记...');
+            
+            try {
+                const note = {
+                    title: title,
+                    content: content,
+                    created: new Date().toISOString(),
+                    id: Date.now()
+                };
+                
+                // 保存到文件系统
+                const fileName = `note_${note.id}.json`;
+                await puter.fs.write(fileName, JSON.stringify(note, null, 2));
+                incrementRequests();
+                
+                // 保存到键值存储
+                await puter.kv.set(`note_${note.id}`, JSON.stringify(note));
+                incrementRequests();
+                
+                stats.files++;
+                stats.kvPairs++;
+                updateStats();
+                
+                showMessage('noteOutput', `✅ 笔记 "${title}" 已保存！\n\n文件: ${fileName}\n键值: note_${note.id}`, 'success');
+                
+                // 清空输入
+                document.getElementById('noteTitle').value = '';
+                document.getElementById('noteContent').value = '';
+                
+            } catch (error) {
+                showMessage('noteOutput', `❌ 保存失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadNotes() {
+            showLoading('noteOutput', '加载笔记列表...');
+            incrementRequests();
+
+            try {
+                const files = await puter.fs.readdir('/');
+                const noteFiles = files.filter(file => file.name.startsWith('note_') && file.name.endsWith('.json'));
+                
+                if (noteFiles.length === 0) {
+                    showMessage('noteOutput', '📝 暂无笔记', 'info');
+                    return;
+                }
+                
+                let notesHTML = `📚 找到 ${noteFiles.length} 条笔记:\n\n`;
+                
+                for (const file of noteFiles.slice(0, 5)) { // 只显示前5条
+                    try {
+                        const noteContent = await puter.fs.read(file.name);
+                        const noteText = await noteContent.text();
+                        const note = JSON.parse(noteText);
+                        
+                        notesHTML += `📝 ${note.title}\n`;
+                        notesHTML += `   ${note.content.substring(0, 50)}${note.content.length > 50 ? '...' : ''}\n`;
+                        notesHTML += `   📅 ${new Date(note.created).toLocaleString()}\n\n`;
+                        
+                        incrementRequests();
+                    } catch (e) {
+                        console.error('读取笔记失败:', e);
+                    }
+                }
+                
+                showMessage('noteOutput', notesHTML, 'success');
+                
+            } catch (error) {
+                showMessage('noteOutput', `❌ 加载失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function aiSummarizeNote() {
+            const content = document.getElementById('noteContent').value.trim();
+            
+            if (!content) {
+                showMessage('noteOutput', '请先输入笔记内容！', 'error');
+                return;
+            }
+
+            showLoading('noteOutput', 'AI 正在分析笔记...');
+            incrementRequests();
+
+            try {
+                const prompt = `请为以下笔记内容生成一个简洁的总结：\n\n${content}`;
+                const summary = await puter.ai.chat(prompt);
+                showMessage('noteOutput', `🤖 AI 总结:\n\n${summary}`, 'success');
+            } catch (error) {
+                showMessage('noteOutput', `❌ AI 总结失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAdvancedExample() {
+            showLoading('advancedOutput', '运行完整应用示例...');
+            
+            try {
+                // 模拟完整应用初始化
+                let log = '🚀 初始化 Puter.js 应用...\n\n';
+                
+                // 1. 检查认证
+                const isSignedIn = puter.auth.isSignedIn();
+                log += `1. 身份验证: ${isSignedIn ? '✅ 已登录' : '❌ 需要登录'}\n`;
+                
+                // 2. 加载设置
+                try {
+                    const settings = await puter.kv.get('app_settings');
+                    log += `2. 加载设置: ${settings ? '✅ 成功' : '⚠️ 使用默认设置'}\n`;
+                    incrementRequests();
+                } catch (e) {
+                    log += `2. 加载设置: ⚠️ 使用默认设置\n`;
+                }
+                
+                // 3. 创建示例数据
+                const appData = {
+                    version: '1.0.0',
+                    initialized: new Date().toISOString(),
+                    features: ['ai', 'storage', 'auth']
+                };
+                
+                await puter.fs.write('app_data.json', JSON.stringify(appData, null, 2));
+                incrementRequests();
+                log += `3. 创建应用数据: ✅ 成功\n`;
+                
+                // 4. AI 功能测试
+                const aiResponse = await puter.ai.chat('Puter.js 有什么优势？');
+                incrementRequests();
+                log += `4. AI 功能测试: ✅ 成功\n`;
+                
+                // 5. 保存会话信息
+                await puter.kv.set('last_session', JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    features_tested: ['auth', 'storage', 'ai'],
+                    status: 'success'
+                }));
+                incrementRequests();
+                log += `5. 保存会话: ✅ 成功\n\n`;
+                
+                log += `🎉 应用初始化完成！\n\n`;
+                log += `💡 AI 回复预览:\n${aiResponse.substring(0, 100)}...`;
+                
+                stats.files++;
+                stats.kvPairs++;
+                updateStats();
+                
+                showMessage('advancedOutput', log, 'success');
+                
+            } catch (error) {
+                showMessage('advancedOutput', `❌ 高级示例失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('load', async () => {
+            try {
+                const isSignedIn = puter.auth.isSignedIn();
+                document.getElementById('authStatus').textContent = isSignedIn ? '已登录' : '未登录';
+            } catch (error) {
+                document.getElementById('authStatus').textContent = '检查失败';
+            }
+            
+            updateStats();
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        const activeElement = document.activeElement;
+                        if (activeElement.id === 'aiPrompt') {
+                            chatWithAI();
+                        }
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        if (document.getElementById('storage-demo').classList.contains('active')) {
+                            saveFile();
+                        }
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

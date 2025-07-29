@@ -32,6 +32,14 @@ interface AgentsModalProps {
 }
 
 export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) => {
+  // Safe invoke wrapper that checks for Tauri environment
+  const safeInvoke = async <T,>(command: string, args?: any): Promise<T> => {
+    if (typeof window !== 'undefined' && !(window as any).__TAURI__) {
+      throw new Error(`Tauri command '${command}' not available in browser environment`);
+    }
+    return await invoke<T>(command, args);
+  };
+
   const [activeTab, setActiveTab] = useState('agents');
   const [agents, setAgents] = useState<Agent[]>([]);
   const [runningAgents, setRunningAgents] = useState<AgentRunWithMetrics[]>([]);
@@ -172,7 +180,7 @@ export const AgentsModal: React.FC<AgentsModalProps> = ({ open, onOpenChange }) 
       });
       
       if (filePath) {
-        await invoke('write_file', { path: filePath, content: JSON.stringify(exportData, null, 2) });
+        await safeInvoke('write_file', { path: filePath, content: JSON.stringify(exportData, null, 2) });
         setToast({ message: "Agent exported successfully", type: "success" });
       }
     } catch (error) {

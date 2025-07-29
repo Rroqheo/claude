@@ -64,6 +64,14 @@ export type AgentIconName = keyof typeof AGENT_ICONS;
  * <CCAgents onBack={() => setView('home')} />
  */
 export const CCAgents: React.FC<CCAgentsProps> = ({ onBack, className }) => {
+  // Safe invoke wrapper that checks for Tauri environment
+  const safeInvoke = async <T,>(command: string, args?: any): Promise<T> => {
+    if (typeof window !== 'undefined' && !(window as any).__TAURI__) {
+      throw new Error(`Tauri command '${command}' not available in browser environment`);
+    }
+    return await invoke<T>(command, args);
+  };
+
   const [agents, setAgents] = useState<Agent[]>([]);
   const [runs, setRuns] = useState<AgentRunWithMetrics[]>([]);
   const [loading, setLoading] = useState(true);
@@ -204,7 +212,7 @@ export const CCAgents: React.FC<CCAgentsProps> = ({ onBack, className }) => {
       }
       
       // Export the agent to the selected file
-      await invoke('export_agent_to_file', { 
+      await safeInvoke('export_agent_to_file', { 
         id: agent.id!,
         filePath 
       });

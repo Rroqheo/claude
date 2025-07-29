@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地狱之门 - Puter.js 身份验证演示</title>
+    <style>
+        :root {
+            --hell-primary: #FF4500;
+            --hell-secondary: #8B0000;
+            --hell-bg: #1a1a1a;
+            --hell-surface: #2d2d2d;
+            --hell-text: #ffffff;
+            --hell-accent: #FFD700;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--hell-bg), var(--hell-secondary));
+            color: var(--hell-text);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: var(--hell-surface);
+            border: 2px solid var(--hell-primary);
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(255, 69, 0, 0.3);
+            text-align: center;
+        }
+        
+        .header {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, var(--hell-primary), var(--hell-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .auth-section {
+            margin: 30px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, var(--hell-primary), var(--hell-secondary));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+        }
+        
+        .user-info {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--hell-accent);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .protected-content {
+            background: rgba(139, 0, 0, 0.2);
+            border: 1px solid var(--hell-secondary);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .notes-area {
+            width: 100%;
+            height: 200px;
+            background: var(--hell-bg);
+            color: var(--hell-text);
+            border: 1px solid var(--hell-primary);
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        .status {
+            font-size: 18px;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .status.signed-in {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+        }
+        
+        .status.signed-out {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+        }
+        
+        .feature-demo {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 10px;
+            border: 1px solid var(--hell-accent);
+        }
+        
+        .demo-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--hell-accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            🔥 地狱之门 - Puter.js 身份验证演示
+        </div>
+        
+        <div id="status" class="status signed-out">
+            🔒 未登录 - 请先登录以访问完整功能
+        </div>
+        
+        <!-- 公共内容区域 -->
+        <div id="public-content">
+            <div class="auth-section">
+                <h3>🚀 无限制身份验证 API</h3>
+                <p>使用 Puter.js 实现免费、无限制的用户身份验证</p>
+                <p>✅ 无需 API 密钥 | ✅ 无使用限制 | ✅ 免费云存储</p>
+                <button id="sign-in" class="btn">🔑 登录</button>
+            </div>
+        </div>
+        
+        <!-- 受保护内容区域 -->
+        <div id="protected-content" style="display: none;">
+            <div class="user-info">
+                <div id="user-welcome"></div>
+            </div>
+            
+            <div class="feature-demo">
+                <div class="demo-title">📝 个人笔记 (云存储演示)</div>
+                <textarea id="note-content" class="notes-area" 
+                          placeholder="在这里写下你的笔记，它们会自动保存到云端..."></textarea>
+                <br>
+                <button id="save-note" class="btn">💾 保存笔记</button>
+                <button id="load-note" class="btn">📂 加载笔记</button>
+            </div>
+            
+            <div class="feature-demo">
+                <div class="demo-title">🔐 用户信息</div>
+                <div id="user-details"></div>
+            </div>
+            
+            <div class="auth-section">
+                <button id="sign-out" class="btn">🚪 退出登录</button>
+            </div>
+        </div>
+        
+        <div class="feature-demo">
+            <div class="demo-title">⚡ Puter.js 特性</div>
+            <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
+                <li>🆓 完全免费，无 API 密钥要求</li>
+                <li>☁️ 内置云存储功能</li>
+                <li>🔒 安全的用户身份验证</li>
+                <li>📱 跨平台支持</li>
+                <li>🚀 即插即用，无需后端</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 引入 Puter.js -->
+    <script src="https://js.puter.com/v2/"></script>
+    
+    <script>
+        // DOM 元素
+        const statusDiv = document.getElementById('status');
+        const publicContent = document.getElementById('public-content');
+        const protectedContent = document.getElementById('protected-content');
+        const signInButton = document.getElementById('sign-in');
+        const signOutButton = document.getElementById('sign-out');
+        const userWelcome = document.getElementById('user-welcome');
+        const userDetails = document.getElementById('user-details');
+        const noteContent = document.getElementById('note-content');
+        const saveNoteButton = document.getElementById('save-note');
+        const loadNoteButton = document.getElementById('load-note');
+
+        // 更新 UI 状态
+        async function updateUI() {
+            if (puter.auth.isSignedIn()) {
+                // 用户已登录
+                statusDiv.className = 'status signed-in';
+                statusDiv.innerHTML = '✅ 已登录 - 欢迎使用地狱之门！';
+                
+                publicContent.style.display = 'none';
+                protectedContent.style.display = 'block';
+                
+                // 获取用户信息
+                try {
+                    const user = await puter.auth.getUser();
+                    userWelcome.innerHTML = `
+                        <h3>🎉 欢迎回来，${user.username}！</h3>
+                        <p>你已成功登录地狱之门系统</p>
+                    `;
+                    
+                    userDetails.innerHTML = `
+                        <p><strong>用户名:</strong> ${user.username}</p>
+                        <p><strong>邮箱:</strong> ${user.email || '未设置'}</p>
+                        <p><strong>用户 ID:</strong> ${user.id}</p>
+                        <p><strong>登录时间:</strong> ${new Date().toLocaleString()}</p>
+                    `;
+                    
+                    // 自动加载笔记
+                    await loadNote();
+                } catch (error) {
+                    console.error('获取用户信息失败:', error);
+                }
+            } else {
+                // 用户未登录
+                statusDiv.className = 'status signed-out';
+                statusDiv.innerHTML = '🔒 未登录 - 请先登录以访问完整功能';
+                
+                publicContent.style.display = 'block';
+                protectedContent.style.display = 'none';
+            }
+        }
+
+        // 加载笔记
+        async function loadNote() {
+            try {
+                const blob = await puter.fs.read('hell-gate-notes.txt');
+                const text = await blob.text();
+                noteContent.value = text;
+                console.log('笔记加载成功');
+            } catch (error) {
+                // 文件不存在，这是正常的
+                noteContent.value = '';
+                console.log('暂无保存的笔记');
+            }
+        }
+
+        // 保存笔记
+        async function saveNote() {
+            try {
+                await puter.fs.write('hell-gate-notes.txt', noteContent.value);
+                alert('📝 笔记保存成功！');
+                console.log('笔记保存成功');
+            } catch (error) {
+                alert('❌ 保存失败: ' + error.message);
+                console.error('保存笔记失败:', error);
+            }
+        }
+
+        // 事件监听器
+        signInButton.addEventListener('click', async () => {
+            try {
+                await puter.auth.signIn();
+                await updateUI();
+            } catch (error) {
+                alert('❌ 登录失败: ' + error.message);
+                console.error('登录失败:', error);
+            }
+        });
+
+        signOutButton.addEventListener('click', () => {
+            puter.auth.signOut();
+            updateUI();
+        });
+
+        saveNoteButton.addEventListener('click', saveNote);
+        loadNoteButton.addEventListener('click', loadNote);
+
+        // 自动保存笔记 (每30秒)
+        setInterval(async () => {
+            if (puter.auth.isSignedIn() && noteContent.value.trim()) {
+                try {
+                    await puter.fs.write('hell-gate-notes.txt', noteContent.value);
+                    console.log('笔记自动保存成功');
+                } catch (error) {
+                    console.error('自动保存失败:', error);
+                }
+            }
+        }, 30000);
+
+        // 初始化
+        updateUI();
+    </script>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puter.js 入门演示 - 无服务器 AI 和云服务</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #06b6d4;
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --text-color: #f8fafc;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --border-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-color), #1e1b4b);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            border: 2px solid var(--primary-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            opacity: 0.9;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .demo-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .demo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+            border-color: var(--accent-color);
+        }
+
+        .demo-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demo-icon {
+            font-size: 1.5rem;
+        }
+
+        .demo-description {
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .demo-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
+
+        .demo-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .demo-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .demo-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .demo-output {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-bar {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .status-item {
+            display: inline-block;
+            margin: 0 20px;
+        }
+
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: block;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .feature-highlight h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature-item {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .success-message {
+            color: var(--success-color);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success-color);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error-color);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .status-item {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Puter.js 入门演示</h1>
+            <p>无服务器 AI、云存储和身份验证 - 100% 免费，无需 API 密钥</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-value" id="authStatus">检查中...</span>
+                <span class="status-label">身份验证状态</span>
+            </div>
+            <div class="status-item">
+                <span class="status-value" id="requestCount">0</span>
+                <span class="status-label">API 请求次数</span>
+            </div>
+            <div class="status-item">
+                <span class="status-value" id="filesCount">0</span>
+                <span class="status-label">云文件数量</span>
+            </div>
+        </div>
+
+        <div class="demo-grid">
+            <!-- AI 聊天演示 -->
+            <div class="demo-card">
+                <div class="demo-title">
+                    <span class="demo-icon">🤖</span>
+                    GPT-4o AI 聊天
+                </div>
+                <div class="demo-description">
+                    使用 GPT-4o 进行智能对话，完全免费，无需 API 密钥
+                </div>
+                <textarea 
+                    class="demo-input demo-textarea" 
+                    id="aiPrompt" 
+                    placeholder="输入你的问题，比如：为什么鸡要过马路？"
+                >为什么鸡要过马路？</textarea>
+                <button class="demo-button" onclick="testAIChat()">
+                    💬 开始 AI 对话
+                </button>
+                <div class="demo-output" id="aiOutput">等待 AI 响应...</div>
+            </div>
+
+            <!-- 云存储演示 -->
+            <div class="demo-card">
+                <div class="demo-title">
+                    <span class="demo-icon">☁️</span>
+                    云文件存储
+                </div>
+                <div class="demo-description">
+                    在云端存储和读取文件，数据永久保存
+                </div>
+                <input 
+                    class="demo-input" 
+                    id="fileName" 
+                    placeholder="文件名，如：hello.txt"
+                    value="hello.txt"
+                >
+                <textarea 
+                    class="demo-input demo-textarea" 
+                    id="fileContent" 
+                    placeholder="文件内容"
+                >Hello, Puter.js! 这是我的第一个云文件。</textarea>
+                <button class="demo-button" onclick="testFileStorage()">
+                    💾 保存到云端
+                </button>
+                <button class="demo-button" onclick="testFileRead()">
+                    📖 从云端读取
+                </button>
+                <div class="demo-output" id="fileOutput">等待文件操作...</div>
+            </div>
+
+            <!-- 键值存储演示 -->
+            <div class="demo-card">
+                <div class="demo-title">
+                    <span class="demo-icon">🗃️</span>
+                    键值存储
+                </div>
+                <div class="demo-description">
+                    保存用户偏好设置和应用数据
+                </div>
+                <input 
+                    class="demo-input" 
+                    id="kvKey" 
+                    placeholder="键名，如：user_preference"
+                    value="user_preference"
+                >
+                <input 
+                    class="demo-input" 
+                    id="kvValue" 
+                    placeholder="值，如：dark_mode"
+                    value="dark_mode"
+                >
+                <button class="demo-button" onclick="testKVSet()">
+                    💾 保存键值对
+                </button>
+                <button class="demo-button" onclick="testKVGet()">
+                    🔍 获取值
+                </button>
+                <div class="demo-output" id="kvOutput">等待键值操作...</div>
+            </div>
+
+            <!-- 身份验证演示 -->
+            <div class="demo-card">
+                <div class="demo-title">
+                    <span class="demo-icon">🔐</span>
+                    用户身份验证
+                </div>
+                <div class="demo-description">
+                    自动处理用户登录和身份验证
+                </div>
+                <button class="demo-button" onclick="checkAuthStatus()">
+                    🔍 检查登录状态
+                </button>
+                <button class="demo-button" onclick="signInUser()">
+                    🚪 用户登录
+                </button>
+                <button class="demo-button" onclick="getUserInfo()">
+                    👤 获取用户信息
+                </button>
+                <div class="demo-output" id="authOutput">等待身份验证操作...</div>
+            </div>
+        </div>
+
+        <div class="feature-highlight">
+            <h3>🌟 Puter.js 核心特性</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <strong>🆓 完全免费</strong><br>
+                    无需 API 密钥或付费计划
+                </div>
+                <div class="feature-item">
+                    <strong>🤖 AI 功能</strong><br>
+                    GPT-4o, Claude, DALL-E 等
+                </div>
+                <div class="feature-item">
+                    <strong>☁️ 云存储</strong><br>
+                    文件存储和键值数据库
+                </div>
+                <div class="feature-item">
+                    <strong>🔐 身份验证</strong><br>
+                    自动用户管理
+                </div>
+                <div class="feature-item">
+                    <strong>🚀 无服务器</strong><br>
+                    无需后端配置
+                </div>
+                <div class="feature-item">
+                    <strong>💰 用户付费</strong><br>
+                    开发者零成本
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let requestCount = 0;
+        let filesCount = 0;
+
+        // 更新状态栏
+        function updateStatus() {
+            document.getElementById('requestCount').textContent = requestCount;
+            document.getElementById('filesCount').textContent = filesCount;
+        }
+
+        // 增加请求计数
+        function incrementRequest() {
+            requestCount++;
+            updateStatus();
+        }
+
+        // 输出消息到指定区域
+        function outputMessage(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = isError ? 'error-message' : 'success-message';
+            element.innerHTML = `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+
+        // 显示加载状态
+        function showLoading(elementId, message = '处理中...') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<span class="loading"></span>${message}`;
+        }
+
+        // AI 聊天测试
+        async function testAIChat() {
+            const prompt = document.getElementById('aiPrompt').value.trim();
+            if (!prompt) {
+                outputMessage('aiOutput', '请输入问题！', true);
+                return;
+            }
+
+            showLoading('aiOutput', '正在与 GPT-4o 对话...');
+            incrementRequest();
+
+            try {
+                const response = await puter.ai.chat(prompt);
+                outputMessage('aiOutput', `AI 回复：\n${response}`);
+            } catch (error) {
+                outputMessage('aiOutput', `错误：${error.message}`, true);
+            }
+        }
+
+        // 文件存储测试
+        async function testFileStorage() {
+            const fileName = document.getElementById('fileName').value.trim();
+            const fileContent = document.getElementById('fileContent').value.trim();
+            
+            if (!fileName || !fileContent) {
+                outputMessage('fileOutput', '请输入文件名和内容！', true);
+                return;
+            }
+
+            showLoading('fileOutput', '正在保存到云端...');
+            incrementRequest();
+
+            try {
+                await puter.fs.write(fileName, fileContent);
+                filesCount++;
+                updateStatus();
+                outputMessage('fileOutput', `文件 "${fileName}" 已成功保存到云端！`);
+            } catch (error) {
+                outputMessage('fileOutput', `保存失败：${error.message}`, true);
+            }
+        }
+
+        // 文件读取测试
+        async function testFileRead() {
+            const fileName = document.getElementById('fileName').value.trim();
+            
+            if (!fileName) {
+                outputMessage('fileOutput', '请输入文件名！', true);
+                return;
+            }
+
+            showLoading('fileOutput', '正在从云端读取...');
+            incrementRequest();
+
+            try {
+                const fileContent = await puter.fs.read(fileName);
+                const text = await fileContent.text();
+                outputMessage('fileOutput', `文件内容：\n${text}`);
+            } catch (error) {
+                outputMessage('fileOutput', `读取失败：${error.message}`, true);
+            }
+        }
+
+        // 键值存储设置
+        async function testKVSet() {
+            const key = document.getElementById('kvKey').value.trim();
+            const value = document.getElementById('kvValue').value.trim();
+            
+            if (!key || !value) {
+                outputMessage('kvOutput', '请输入键名和值！', true);
+                return;
+            }
+
+            showLoading('kvOutput', '正在保存键值对...');
+            incrementRequest();
+
+            try {
+                await puter.kv.set(key, value);
+                outputMessage('kvOutput', `键值对 "${key}" = "${value}" 已保存！`);
+            } catch (error) {
+                outputMessage('kvOutput', `保存失败：${error.message}`, true);
+            }
+        }
+
+        // 键值存储获取
+        async function testKVGet() {
+            const key = document.getElementById('kvKey').value.trim();
+            
+            if (!key) {
+                outputMessage('kvOutput', '请输入键名！', true);
+                return;
+            }
+
+            showLoading('kvOutput', '正在获取值...');
+            incrementRequest();
+
+            try {
+                const value = await puter.kv.get(key);
+                outputMessage('kvOutput', `键 "${key}" 的值：${value || '(未找到)'}`);
+            } catch (error) {
+                outputMessage('kvOutput', `获取失败：${error.message}`, true);
+            }
+        }
+
+        // 检查身份验证状态
+        async function checkAuthStatus() {
+            showLoading('authOutput', '检查身份验证状态...');
+            incrementRequest();
+
+            try {
+                const isSignedIn = puter.auth.isSignedIn();
+                const status = isSignedIn ? '已登录' : '未登录';
+                outputMessage('authOutput', `身份验证状态：${status}`);
+                
+                // 更新状态栏
+                document.getElementById('authStatus').textContent = status;
+            } catch (error) {
+                outputMessage('authOutput', `检查失败：${error.message}`, true);
+            }
+        }
+
+        // 用户登录
+        async function signInUser() {
+            showLoading('authOutput', '正在处理登录...');
+            incrementRequest();
+
+            try {
+                await puter.auth.signIn();
+                outputMessage('authOutput', '用户登录成功！');
+                document.getElementById('authStatus').textContent = '已登录';
+            } catch (error) {
+                outputMessage('authOutput', `登录失败：${error.message}`, true);
+            }
+        }
+
+        // 获取用户信息
+        async function getUserInfo() {
+            showLoading('authOutput', '获取用户信息...');
+            incrementRequest();
+
+            try {
+                const user = await puter.auth.getUser();
+                outputMessage('authOutput', `用户信息：\n${JSON.stringify(user, null, 2)}`);
+            } catch (error) {
+                outputMessage('authOutput', `获取失败：${error.message}`, true);
+            }
+        }
+
+        // 页面加载时检查身份验证状态
+        window.addEventListener('load', async () => {
+            try {
+                const isSignedIn = puter.auth.isSignedIn();
+                document.getElementById('authStatus').textContent = isSignedIn ? '已登录' : '未登录';
+            } catch (error) {
+                document.getElementById('authStatus').textContent = '检查失败';
+            }
+        });
+
+        // 添加键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        if (document.activeElement.id === 'aiPrompt') {
+                            testAIChat();
+                        }
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

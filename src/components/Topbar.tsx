@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Circle, FileText, Settings, ExternalLink, BarChart3, Network, Info, Bot } from "lucide-react";
+import { Circle, FileText, Settings, ExternalLink, BarChart3, Network, Info, Bot, MessageCircle, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover } from "@/components/ui/popover";
 import { api, type ClaudeVersionStatus } from "@/lib/api";
@@ -32,6 +32,14 @@ interface TopbarProps {
    */
   onAgentsClick?: () => void;
   /**
+   * Callback when Ollama Chat is clicked
+   */
+  onOllamaChatClick?: () => void;
+  /**
+   * Callback when Money Making Dashboard is clicked
+   */
+  onMoneyMakingClick?: () => void;
+  /**
    * Optional className for styling
    */
   className?: string;
@@ -55,6 +63,8 @@ export const Topbar: React.FC<TopbarProps> = ({
   onMCPClick,
   onInfoClick,
   onAgentsClick,
+  onOllamaChatClick,
+  onMoneyMakingClick,
   className,
 }) => {
   const [versionStatus, setVersionStatus] = useState<ClaudeVersionStatus | null>(null);
@@ -178,6 +188,30 @@ export const Topbar: React.FC<TopbarProps> = ({
       
       {/* Action Buttons */}
       <div className="flex items-center space-x-2">
+        {onMoneyMakingClick && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onMoneyMakingClick}
+            className="text-xs bg-green-50 hover:bg-green-100 text-green-700"
+          >
+            <DollarSign className="mr-2 h-3 w-3" />
+            💰 赚钱
+          </Button>
+        )}
+        
+        {onOllamaChatClick && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onOllamaChatClick}
+            className="text-xs"
+          >
+            <MessageCircle className="mr-2 h-3 w-3" />
+            Ollama 聊天
+          </Button>
+        )}
+        
         {onAgentsClick && (
           <Button
             variant="ghost"
@@ -242,4 +276,4 @@ export const Topbar: React.FC<TopbarProps> = ({
       </div>
     </motion.div>
   );
-}; 
+};

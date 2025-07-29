@@ -1,0 +1,125 @@
+/* 地狱之门 ChatGPT 主题样式 */
+
+:root {
+  --hell-gate-bg: #0a0a0a;
+  --hell-gate-surface: #1a1a1a;
+  --hell-gate-border: #ff4444;
+  --hell-gate-text: #ff6666;
+  --hell-gate-accent: #ff0000;
+  --hell-gate-glow: #ff4444;
+}
+
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 50%, #0a0a0a 100%);
+  color: var(--hell-gate-text);
+  font-family: 'Courier New', monospace;
+}
+
+/* 地狱之门容器 */
+.hell-gate-container {
+  background: var(--hell-gate-surface);
+  border: 2px solid var(--hell-gate-border);
+  border-radius: 8px;
+  box-shadow: 0 0 20px var(--hell-gate-glow);
+  animation: hellGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes hellGlow {
+  from { box-shadow: 0 0 20px var(--hell-gate-glow); }
+  to { box-shadow: 0 0 30px var(--hell-gate-accent); }
+}
+
+/* ChatGPT 聊天界面 */
+.chat-container {
+  background: var(--hell-gate-bg);
+  border: 1px solid var(--hell-gate-border);
+  min-height: 600px;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.chat-message {
+  background: var(--hell-gate-surface);
+  border-left: 3px solid var(--hell-gate-accent);
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(255, 68, 68, 0.3);
+}
+
+.chat-input {
+  background: var(--hell-gate-surface);
+  border: 2px solid var(--hell-gate-border);
+  color: var(--hell-gate-text);
+  padding: 15px;
+  border-radius: 8px;
+  width: 100%;
+  font-family: 'Courier New', monospace;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: var(--hell-gate-accent);
+  box-shadow: 0 0 15px var(--hell-gate-glow);
+}
+
+/* 按钮样式 */
+.hell-gate-button {
+  background: linear-gradient(45deg, var(--hell-gate-accent), #cc0000);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.hell-gate-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+}
+
+/* 标题样式 */
+.hell-gate-title {
+  color: var(--hell-gate-accent);
+  text-align: center;
+  font-size: 2.5em;
+  font-weight: bold;
+  text-shadow: 0 0 10px var(--hell-gate-glow);
+  margin-bottom: 30px;
+  animation: titlePulse 3s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { text-shadow: 0 0 10px var(--hell-gate-glow); }
+  50% { text-shadow: 0 0 20px var(--hell-gate-accent), 0 0 30px var(--hell-gate-accent); }
+}
+
+/* 代码块样式 */
+pre, code {
+  background: #000;
+  border: 1px solid var(--hell-gate-border);
+  color: #ff9999;
+  font-family: 'Courier New', monospace;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--hell-gate-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hell-gate-border);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hell-gate-accent);
+}

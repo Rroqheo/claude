@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Minds Platform - 全球大佬平等讨论平台</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a0a0a 50%, #2d1b1b 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 40px;
+            background: linear-gradient(45deg, #8B0000, #DC143C, #B22222);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(220, 20, 60, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 4s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 10px;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #DC143C, transparent);
+            transition: left 0.5s ease;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(220, 20, 60, 0.3);
+            border-color: #DC143C;
+        }
+
+        .card h3 {
+            color: #DC143C;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .discussion-area {
+            height: 400px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #DC143C;
+            background: rgba(220, 20, 60, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .message:hover {
+            background: rgba(220, 20, 60, 0.2);
+            transform: translateX(5px);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #DC143C;
+        }
+
+        .user-title {
+            font-size: 0.85em;
+            color: #888;
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .message-time {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        .message-content {
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            resize: vertical;
+            min-height: 50px;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #DC143C;
+            box-shadow: 0 0 10px rgba(220, 20, 60, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #444, #666);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #006400, #32CD32);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #FF8C00, #FFA500);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #8B0000, #FF0000);
+        }
+
+        .voting-section {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #444;
+        }
+
+        .proposal {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .proposal:hover {
+            border-color: #DC143C;
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.2);
+        }
+
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .proposal-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #DC143C;
+        }
+
+        .proposal-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: linear-gradient(45deg, #006400, #32CD32);
+            color: white;
+        }
+
+        .status-passed {
+            background: linear-gradient(45deg, #4169E1, #1E90FF);
+            color: white;
+        }
+
+        .status-rejected {
+            background: linear-gradient(45deg, #8B0000, #FF0000);
+            color: white;
+        }
+
+        .proposal-content {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .voting-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .vote-stat {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: #2a2a2a;
+        }
+
+        .vote-count {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .vote-count.support {
+            color: #32CD32;
+        }
+
+        .vote-count.oppose {
+            color: #FF4444;
+        }
+
+        .vote-count.abstain {
+            color: #FFA500;
+        }
+
+        .vote-label {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .voting-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            transition: width 0.3s ease;
+        }
+
+        .user-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            transition: background 0.3s ease;
+        }
+
+        .user-item:hover {
+            background: rgba(220, 20, 60, 0.1);
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .reputation-score {
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #DC143C;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #ccc;
+            margin-top: 5px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #006400, #32CD32);
+        }
+
+        .notification.warning {
+            background: linear-gradient(45deg, #FF8C00, #FFA500);
+        }
+
+        .ai-assistant {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #444;
+        }
+
+        .ai-response {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: #2a2a2a;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85em;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            color: white;
+            border-color: #DC143C;
+        }
+
+        .lang-btn:hover {
+            border-color: #DC143C;
+            color: #DC143C;
+        }
+
+        @media (max-width: 1200px) {
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .voting-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .voting-actions {
+                flex-direction: column;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #444;
+            border-radius: 50%;
+            border-top-color: #DC143C;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #888;
+            font-style: italic;
+            padding: 10px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #DC143C;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        /* 古代法庭礼仪动画效果 */
+        @keyframes ritualEffect {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0.8) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes bowAnimation {
+            0% { transform: rotateX(0deg); }
+            50% { transform: rotateX(30deg); }
+            100% { transform: rotateX(0deg); }
+        }
+
+        @keyframes saluteAnimation {
+            0% { transform: translateY(0) rotateZ(0deg); }
+            25% { transform: translateY(-10px) rotateZ(-5deg); }
+            75% { transform: translateY(-10px) rotateZ(5deg); }
+            100% { transform: translateY(0) rotateZ(0deg); }
+        }
+
+        @keyframes kneelAnimation {
+            0% { transform: scaleY(1); }
+            50% { transform: scaleY(0.7); }
+            100% { transform: scaleY(1); }
+        }
+
+        @keyframes virtueGlow {
+            0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+        }
+
+        @keyframes ancientFade {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .ritual-effect {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            font-size: 3em;
+            z-index: 1000;
+            pointer-events: none;
+            animation: ritualEffect 2s ease-out forwards;
+        }
+
+        .virtue-increase {
+            position: fixed;
+            top: 20%;
+            right: 20px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #8B4513;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 1000;
+            animation: ancientFade 0.5s ease-out, virtueGlow 1s ease-in-out;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Global Minds Platform</h1>
+            <p>全球大佬平等讨论平台 - 智慧碰撞，共创未来</p>
+            <p style="font-size: 1em; margin-top: 10px;">Where Great Minds Meet as Equals</p>
+        </div>
+
+        <div class="platform-grid">
+            <div class="main-content">
+                <!-- 实时讨论区 -->
+                <div class="card">
+                    <h3>💬 实时讨论大厅</h3>
+                    <div class="language-selector">
+                        <div class="lang-btn active" onclick="setLanguage('zh')">中文</div>
+                        <div class="lang-btn" onclick="setLanguage('en')">English</div>
+                        <div class="lang-btn" onclick="setLanguage('ja')">日本語</div>
+                        <div class="lang-btn" onclick="setLanguage('ko')">한국어</div>
+                        <div class="lang-btn" onclick="setLanguage('es')">Español</div>
+                        <div class="lang-btn" onclick="setLanguage('fr')">Français</div>
+                    </div>
+                    <div class="discussion-area" id="discussion-area">
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="user-info">
+                                    <div class="user-avatar">E</div>
+                                    <div>
+                                        <div class="user-name">Elon Musk</div>
+                                        <div class="user-title">科技创新家</div>
+                                    </div>
+                                </div>
+                                <div class="message-time">刚刚</div>
+                            </div>
+                            <div class="message-content">
+                                我认为我们应该建立一个去中心化的全球治理框架，让每个人的声音都能被听到。技术应该服务于人类的共同进步。
+                            </div>
+                        </div>
+                        
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="user-info">
+                                    <div class="user-avatar">B</div>
+                                    <div>
+                                        <div class="user-name">Bill Gates</div>
+                                        <div class="user-title">慈善家</div>
+                                    </div>
+                                </div>
+                                <div class="message-time">2分钟前</div>
+                            </div>
+                            <div class="message-content">
+                                完全同意！我们需要确保技术发展的同时，也要关注全球健康和教育平等。这个平台就是一个很好的开始。
+                            </div>
+                        </div>
+
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="user-info">
+                                    <div class="user-avatar">马</div>
+                                    <div>
+                                        <div class="user-name">马云</div>
+                                        <div class="user-title">企业家</div>
+                                    </div>
+                                </div>
+                                <div class="message-time">5分钟前</div>
+                            </div>
+                            <div class="message-content">
+                                我建议我们先从小的议题开始，比如建立全球数字身份认证标准。这样可以让更多人参与到全球化进程中。
+                            </div>
+                        </div>
+
+                        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                            <span>有人正在输入</span>
+                            <div class="typing-dots">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-area">
+                        <textarea class="message-input" id="message-input" placeholder="分享您的观点... (支持多语言自动翻译)" onkeydown="handleKeyDown(event)"></textarea>
+                        <button class="btn" onclick="sendMessage()">发送</button>
+                        <button class="btn btn-secondary" onclick="translateMessage()">🌐 翻译</button>
+                    </div>
+                </div>
+
+                <!-- 古代法庭系统 -->
+        <div class="card">
+            <h3>🏛️ 古代法庭系统</h3>
+            
+            <!-- 法庭状态 -->
+            <div style="background: linear-gradient(45deg, #8B4513, #CD853F); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 3px solid #FFD700;">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 2.5em; margin-bottom: 10px;">🏛️</div>
+                    <h4 style="margin: 0; color: #FFD700; font-size: 1.4em;">大理寺法庭</h4>
+                    <div style="font-size: 0.9em; color: #FFF8DC; margin-top: 5px;" id="court-status">升堂中 - 威武肃静</div>
+                </div>
+                
+                <!-- 当前审案 -->
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <div style="font-size: 1.1em; font-weight: 600; color: #FFD700; margin-bottom: 8px;">📜 当前审案</div>
+                    <div style="color: #FFF8DC; font-size: 0.9em; line-height: 1.4;" id="current-case">
+                        案件: 全球数字身份认证标准之争<br>
+                        状态: 正在听取双方陈述<br>
+                        进度: 原告陈述完毕，被告准备发言
+                    </div>
+                </div>
+                
+                <!-- 法庭角色 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <div style="background: rgba(255,215,0,0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 1.2em; margin-bottom: 5px;">⚖️</div>
+                        <div style="font-size: 0.9em; font-weight: 600; color: #FFD700;">主审法官</div>
+                        <div style="font-size: 0.8em; color: #FFF8DC;" id="chief-judge">马云大人</div>
+                    </div>
+                    <div style="background: rgba(255,215,0,0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 1.2em; margin-bottom: 5px;">📝</div>
+                        <div style="font-size: 0.9em; font-weight: 600; color: #FFD700;">书记官</div>
+                        <div style="font-size: 0.8em; color: #FFF8DC;" id="clerk">李彦宏</div>
+                    </div>
+                </div>
+                
+                <!-- 正反双方 -->
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px; align-items: center; margin-bottom: 15px;">
+                    <div style="text-align: center; background: rgba(0,100,0,0.3); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 1.2em; margin-bottom: 5px;">🛡️</div>
+                        <div style="font-weight: 600; color: #32CD32;">原告方</div>
+                        <div style="font-size: 0.8em; color: #FFF8DC;" id="plaintiff">马化腾</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5em;">⚔️</div>
+                        <div style="font-size: 0.8em; color: #FFD700;">对簿公堂</div>
+                    </div>
+                    <div style="text-align: center; background: rgba(139,0,0,0.3); padding: 12px; border-radius: 8px;">
+                        <div style="font-size: 1.2em; margin-bottom: 5px;">⚔️</div>
+                        <div style="font-weight: 600; color: #FF4444;">被告方</div>
+                        <div style="font-size: 0.8em; color: #FFF8DC;" id="defendant">雷军</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 审理程序 -->
+            <div style="background: #2a2a2a; padding: 15px; border-radius: 8px; border-left: 4px solid #FFD700; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 10px 0; color: #FFD700; font-size: 1.1em;">📋 审理程序</h4>
+                <div style="font-size: 0.9em; color: #FFF8DC; line-height: 1.5;">
+                    <div style="margin-bottom: 8px; padding: 8px; background: rgba(255,215,0,0.1); border-radius: 4px;">
+                        ✅ 1. 升堂仪式 - 威武肃静
+                    </div>
+                    <div style="margin-bottom: 8px; padding: 8px; background: rgba(255,215,0,0.1); border-radius: 4px;">
+                        ✅ 2. 宣读案情 - 已完成
+                    </div>
+                    <div style="margin-bottom: 8px; padding: 8px; background: rgba(255,215,0,0.3); border-radius: 4px; border: 1px solid #FFD700;">
+                        🔄 3. 原告陈述 - 进行中
+                    </div>
+                    <div style="margin-bottom: 8px; padding: 8px; background: rgba(100,100,100,0.2); border-radius: 4px;">
+                        ⏳ 4. 被告答辩 - 待进行
+                    </div>
+                    <div style="margin-bottom: 8px; padding: 8px; background: rgba(100,100,100,0.2); border-radius: 4px;">
+                        ⏳ 5. 证据展示 - 待进行
+                    </div>
+                    <div style="padding: 8px; background: rgba(100,100,100,0.2); border-radius: 4px;">
+                        ⏳ 6. 法官判决 - 待进行
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 礼仪动作 -->
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin: 0 0 10px 0; color: #DC143C;">🎭 礼仪动作</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                    <button class="btn" style="padding: 10px 8px; font-size: 0.8em; background: linear-gradient(45deg, #8B4513, #CD853F); border: none;" onclick="performRitual('bow')">
+                        🙇‍♂️ 行礼
+                    </button>
+                    <button class="btn" style="padding: 10px 8px; font-size: 0.8em; background: linear-gradient(45deg, #8B4513, #CD853F); border: none;" onclick="performRitual('salute')">
+                        🤝 作揖
+                    </button>
+                    <button class="btn" style="padding: 10px 8px; font-size: 0.8em; background: linear-gradient(45deg, #8B4513, #CD853F); border: none;" onclick="performRitual('kneel')">
+                        🧎‍♂️ 跪拜
+                    </button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                    <button class="btn" style="padding: 10px 8px; font-size: 0.8em; background: linear-gradient(45deg, #4B0082, #8A2BE2); border: none;" onclick="speakInCourt()">
+                        📢 请求发言
+                    </button>
+                    <button class="btn" style="padding: 10px 8px; font-size: 0.8em; background: linear-gradient(45deg, #B8860B, #DAA520); border: none;" onclick="presentEvidence()">
+                        📜 呈递证据
+                    </button>
+                </div>
+            </div>
+
+            <!-- 游戏化投票界面 -->
+            <div class="voting-section">
+                        <div class="proposal">
+                            <div class="proposal-header">
+                                <div class="proposal-title">提案 #001: 建立全球数字身份认证标准</div>
+                                <div class="proposal-status status-active">投票中</div>
+                            </div>
+                            <div class="proposal-content">
+                                建议建立一个统一的全球数字身份认证标准，确保每个人在数字世界中的身份安全和隐私保护。该标准将采用区块链技术，实现去中心化管理。
+                            </div>
+                            <div class="voting-stats">
+                                <div class="vote-stat">
+                                    <div class="vote-count support" id="support-count-1">127</div>
+                                    <div class="vote-label">支持</div>
+                                </div>
+                                <div class="vote-stat">
+                                    <div class="vote-count oppose" id="oppose-count-1">23</div>
+                                    <div class="vote-label">反对</div>
+                                </div>
+                                <div class="vote-stat">
+                                    <div class="vote-count abstain" id="abstain-count-1">15</div>
+                                    <div class="vote-label">弃权</div>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 77%"></div>
+                            </div>
+                            <div class="voting-actions">
+                                <button class="btn btn-success" onclick="vote(1, 'support')">✅ 支持</button>
+                                <button class="btn btn-danger" onclick="vote(1, 'oppose')">❌ 反对</button>
+                                <button class="btn btn-warning" onclick="vote(1, 'abstain')">⚪ 弃权</button>
+                            </div>
+                        </div>
+
+                        <div class="proposal">
+                            <div class="proposal-header">
+                                <div class="proposal-title">提案 #002: 全球气候变化应对联盟</div>
+                                <div class="proposal-status status-passed">已通过</div>
+                            </div>
+                            <div class="proposal-content">
+                                成立全球气候变化应对联盟，整合各国资源，共同应对气候挑战。联盟将制定统一的碳排放标准和清洁能源发展计划。
+                            </div>
+                            <div class="voting-stats">
+                                <div class="vote-stat">
+                                    <div class="vote-count support">289</div>
+                                    <div class="vote-label">支持</div>
+                                </div>
+                                <div class="vote-stat">
+                                    <div class="vote-count oppose">45</div>
+                                    <div class="vote-label">反对</div>
+                                </div>
+                                <div class="vote-stat">
+                                    <div class="vote-count abstain">12</div>
+                                    <div class="vote-label">弃权</div>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 83%"></div>
+                            </div>
+                            <p style="text-align: center; color: #32CD32; margin-top: 10px; font-weight: 600;">
+                                ✅ 提案已通过 (83% 支持率)
+                            </p>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <button class="btn" onclick="createProposal()">📝 创建新提案</button>
+                            <button class="btn btn-secondary" onclick="viewVotingHistory()">📊 查看投票历史</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <!-- 古代官阶系统 -->
+                <div class="card">
+                    <h3>🏛️ 古代官阶系统</h3>
+                    <div style="background: linear-gradient(45deg, #8B4513, #CD853F); padding: 20px; border-radius: 12px; margin-bottom: 15px; text-align: center; border: 3px solid #FFD700;">
+                        <div style="font-size: 2.5em; margin-bottom: 10px;">🎓</div>
+                        <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 5px; color: #FFD700;">七品县令</div>
+                        <div style="font-size: 0.9em; opacity: 0.9; color: #FFF8DC;">正七品文官</div>
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                            <div style="font-size: 0.8em; margin-bottom: 5px; color: #FFF8DC;">距离升职"六品主事"</div>
+                            <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: #FFD700; height: 100%; width: 65%; transition: width 0.3s ease;"></div>
+                            </div>
+                            <div style="font-size: 0.7em; margin-top: 5px; opacity: 0.8; color: #FFF8DC;">需德行分: 350/500</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 四维德行评分 -->
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="margin-bottom: 10px; color: #DC143C;">📜 四维德行</h4>
+                        <div style="space-y: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: linear-gradient(45deg, #2F4F4F, #708090); border-radius: 6px; margin-bottom: 6px;">
+                                <span style="font-size: 0.9em; color: #FFD700;">🎭 德行</span>
+                                <span style="color: #32CD32; font-weight: 600;">85/100</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: linear-gradient(45deg, #2F4F4F, #708090); border-radius: 6px; margin-bottom: 6px;">
+                                <span style="font-size: 0.9em; color: #FFD700;">📚 才学</span>
+                                <span style="color: #1E90FF; font-weight: 600;">78/100</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: linear-gradient(45deg, #2F4F4F, #708090); border-radius: 6px; margin-bottom: 6px;">
+                                <span style="font-size: 0.9em; color: #FFD700;">👑 威望</span>
+                                <span style="color: #FF6347; font-weight: 600;">72/100</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: linear-gradient(45deg, #2F4F4F, #708090); border-radius: 6px;">
+                                <span style="font-size: 0.9em; color: #FFD700;">⚖️ 品格</span>
+                                <span style="color: #9370DB; font-weight: 600;">90/100</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 礼仪规范 -->
+                    <div>
+                        <h4 style="margin-bottom: 10px; color: #DC143C;">🎋 礼仪规范</h4>
+                        <div style="background: #2a2a2a; padding: 12px; border-radius: 8px; border-left: 4px solid #FFD700;">
+                            <div style="font-size: 0.8em; line-height: 1.4; color: #FFF8DC;">
+                                <div style="margin-bottom: 6px;">• 发言前须行礼致敬</div>
+                                <div style="margin-bottom: 6px;">• 使用敬语和谦辞</div>
+                                <div style="margin-bottom: 6px;">• 遵循长幼有序</div>
+                                <div style="margin-bottom: 6px;">• 不得无礼中断他人</div>
+                                <div>• 退场时须告辞</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; text-align: center;">
+                            <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.8em; background: linear-gradient(45deg, #8B4513, #CD853F); border: none;" onclick="showEtiquetteGuide()">
+                                📖 礼仪指南
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 排行榜 -->
+                <div class="card">
+                    <h3>🏆 大佬排行榜</h3>
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                            <button class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 0.8em;" onclick="switchRanking('points')">积分榜</button>
+                            <button class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 0.8em;" onclick="switchRanking('judge')">法官榜</button>
+                            <button class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 0.8em;" onclick="switchRanking('debate')">辩论榜</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ranking-list" id="ranking-list">
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: linear-gradient(45deg, #FFD700, #FFA500); border-radius: 8px; margin-bottom: 8px; color: #000;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-size: 1.2em;">🥇</div>
+                                <div>
+                                    <div style="font-weight: 600;">Elon Musk</div>
+                                    <div style="font-size: 0.8em; opacity: 0.8;">科技创新家</div>
+                                </div>
+                            </div>
+                            <div style="font-weight: bold;">15,420</div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: linear-gradient(45deg, #C0C0C0, #A9A9A9); border-radius: 8px; margin-bottom: 8px; color: #000;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-size: 1.2em;">🥈</div>
+                                <div>
+                                    <div style="font-weight: 600;">Bill Gates</div>
+                                    <div style="font-size: 0.8em; opacity: 0.8;">慈善家</div>
+                                </div>
+                            </div>
+                            <div style="font-weight: bold;">12,890</div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: linear-gradient(45deg, #CD7F32, #B8860B); border-radius: 8px; margin-bottom: 8px; color: #fff;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-size: 1.2em;">🥉</div>
+                                <div>
+                                    <div style="font-weight: 600;">马云</div>
+                                    <div style="font-size: 0.8em; opacity: 0.8;">企业家</div>
+                                </div>
+                            </div>
+                            <div style="font-weight: bold;">11,250</div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #2a2a2a; border-radius: 6px; margin-bottom: 6px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-size: 1em; color: #888;">4</div>
+                                <div>
+                                    <div style="font-weight: 600; color: #e0e0e0;">您</div>
+                                    <div style="font-size: 0.8em; color: #888;">平台用户</div>
+                                </div>
+                            </div>
+                            <div style="font-weight: bold; color: #DC143C;">8,520</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 在线用户 -->
+                <div class="card">
+                    <h3>👥 在线大佬 (165)</h3>
+                    <div class="user-list">
+                        <div class="user-item">
+                            <div class="user-info">
+                                <div class="user-avatar">E</div>
+                                <div>
+                                    <div class="user-name">Elon Musk</div>
+                                    <div class="user-title">科技创新家</div>
+                                </div>
+                            </div>
+                            <div class="reputation-score">9.8</div>
+                        </div>
+                        <div class="user-item">
+                            <div class="user-info">
+                                <div class="user-avatar">B</div>
+                                <div>
+                                    <div class="user-name">Bill Gates</div>
+                                    <div class="user-title">慈善家</div>
+                                </div>
+                            </div>
+                            <div class="reputation-score">9.7</div>
+                        </div>
+                        <div class="user-item">
+                            <div class="user-info">
+                                <div class="user-avatar">马</div>
+                                <div>
+                                    <div class="user-name">马云</div>
+                                    <div class="user-title">企业家</div>
+                                </div>
+                            </div>
+                            <div class="reputation-score">9.5</div>
+                        </div>
+                        <div class="user-item">
+                            <div class="user-info">
+                                <div class="user-avatar">S</div>
+                                <div>
+                                    <div class="user-name">Satya Nadella</div>
+                                    <div class="user-title">技术领袖</div>
+                                </div>
+                            </div>
+                            <div class="reputation-score">9.4</div>
+                        </div>
+                        <div class="user-item">
+                            <div class="user-info">
+                                <div class="user-avatar">雷</div>
+                                <div>
+                                    <div class="user-name">雷军</div>
+                                    <div class="user-title">科技企业家</div>
+                                </div>
+                            </div>
+                            <div class="reputation-score">9.2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI 智能助手 -->
+                <div class="card">
+                    <h3>🤖 AI 智能助手</h3>
+                    <div class="ai-assistant">
+                        <p style="margin-bottom: 15px; color: #ccc;">我可以帮您：</p>
+                        <ul style="color: #ccc; margin-bottom: 15px; padding-left: 20px;">
+                            <li>实时翻译讨论内容</li>
+                            <li>总结讨论要点</li>
+                            <li>分析投票趋势</li>
+                            <li>提供决策建议</li>
+                        </ul>
+                        <textarea class="message-input" id="ai-input" placeholder="向AI助手提问..." style="margin-bottom: 10px; min-height: 60px;"></textarea>
+                        <button class="btn" onclick="askAI()">🤖 询问AI</button>
+                        <div class="ai-response" id="ai-response">
+                            <p style="color: #888; font-style: italic;">AI助手准备就绪，随时为您服务...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 平台统计 -->
+                <div class="card">
+                    <h3>📊 平台统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value" id="total-users">2,847</span>
+                            <div class="stat-label">注册用户</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="active-proposals">12</span>
+                            <div class="stat-label">活跃提案</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="total-votes">15,623</span>
+                            <div class="stat-label">总投票数</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="success-rate">78%</span>
+                            <div class="stat-label">提案通过率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentLanguage = 'zh';
+        let userVotes = {};
+        let platformStats = {
+            totalUsers: 2847,
+            activeProposals: 12,
+            totalVotes: 15623,
+            successRate: 78
+        };
+
+        // 模拟用户数据
+        const currentUser = {
+            name: '您',
+            avatar: '您',
+            title: '平台用户',
+            reputation: 8.5
+        };
+
+        // 工具函数
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        function formatTime(date) {
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return '刚刚';
+            if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+            if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+            return Math.floor(diff / 86400000) + '天前';
+        }
+
+        function updateStats() {
+            document.getElementById('total-users').textContent = platformStats.totalUsers.toLocaleString();
+            document.getElementById('active-proposals').textContent = platformStats.activeProposals;
+            document.getElementById('total-votes').textContent = platformStats.totalVotes.toLocaleString();
+            document.getElementById('success-rate').textContent = platformStats.successRate + '%';
+        }
+
+        // 语言切换
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            
+            // 更新语言按钮状态
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            showNotification(`语言已切换到 ${getLanguageName(lang)}`);
+        }
+
+        function getLanguageName(lang) {
+            const names = {
+                'zh': '中文',
+                'en': 'English',
+                'ja': '日本語',
+                'ko': '한국어',
+                'es': 'Español',
+                'fr': 'Français'
+            };
+            return names[lang] || lang;
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const content = input.value.trim();
+            
+            if (!content) {
+                showNotification('请输入消息内容', 'warning');
+                return;
+            }
+
+            // 显示输入指示器
+            showTypingIndicator();
+
+            // 创建消息元素
+            const message = createMessageElement({
+                user: currentUser,
+                content: content,
+                time: new Date()
+            });
+
+            // 添加到讨论区
+            const discussionArea = document.getElementById('discussion-area');
+            const typingIndicator = document.getElementById('typing-indicator');
+            discussionArea.insertBefore(message, typingIndicator);
+
+            // 清空输入框
+            input.value = '';
+
+            // 滚动到底部
+            discussionArea.scrollTop = discussionArea.scrollHeight;
+
+            // 隐藏输入指示器
+            setTimeout(() => {
+                hideTypingIndicator();
+            }, 1000);
+
+            showNotification('消息发送成功');
+        }
+
+        function createMessageElement(data) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <div class="user-info">
+                        <div class="user-avatar">${data.user.avatar}</div>
+                        <div>
+                            <div class="user-name">${data.user.name}</div>
+                            <div class="user-title">${data.user.title}</div>
+                        </div>
+                    </div>
+                    <div class="message-time">${formatTime(data.time)}</div>
+                </div>
+                <div class="message-content">${data.content}</div>
+            `;
+            return messageDiv;
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typing-indicator').style.display = 'flex';
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typing-indicator').style.display = 'none';
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // 翻译功能
+        async function translateMessage() {
+            const input = document.getElementById('message-input');
+            const content = input.value.trim();
+            
+            if (!content) {
+                showNotification('请先输入要翻译的内容', 'warning');
+                return;
+            }
+
+            try {
+                showNotification('正在翻译...', 'warning');
+                
+                // 模拟翻译API调用
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const translations = {
+                    'zh': content,
+                    'en': 'This is a translated message in English.',
+                    'ja': 'これは日本語に翻訳されたメッセージです。',
+                    'ko': '이것은 한국어로 번역된 메시지입니다.',
+                    'es': 'Este es un mensaje traducido al español.',
+                    'fr': 'Ceci est un message traduit en français.'
+                };
+                
+                input.value = translations[currentLanguage] || content;
+                showNotification(`已翻译为${getLanguageName(currentLanguage)}`);
+                
+            } catch (error) {
+                showNotification('翻译失败，请稍后重试', 'error');
+            }
+        }
+
+        // 投票功能
+        function vote(proposalId, voteType) {
+            if (userVotes[proposalId]) {
+                showNotification('您已经对此提案投过票了', 'warning');
+                return;
+            }
+
+            // 记录用户投票
+            userVotes[proposalId] = voteType;
+
+            // 更新投票计数
+            const countElement = document.getElementById(`${voteType}-count-${proposalId}`);
+            if (countElement) {
+                const currentCount = parseInt(countElement.textContent);
+                countElement.textContent = currentCount + 1;
+            }
+
+            // 更新统计
+            platformStats.totalVotes++;
+            updateStats();
+
+            const voteLabels = {
+                'support': '支持',
+                'oppose': '反对',
+                'abstain': '弃权'
+            };
+
+            showNotification(`投票成功！您选择了：${voteLabels[voteType]}`);
+        }
+
+        // 古代法庭系统功能
+        function performRitual(ritualType) {
+            const ritualMessages = {
+                'bow': '🙇‍♂️ 您向法庭行礼致敬，德行+2，品格+1',
+                'salute': '🤝 您向在场诸位作揖问好，威望+1，德行+1',
+                'kneel': '🧎‍♂️ 您向主审法官跪拜请安，品格+3，威望+1'
+            };
+            
+            showNotification(ritualMessages[ritualType] || '礼仪动作完成');
+            
+            // 更新德行分数
+            updateVirtueScore(ritualType);
+            
+            // 添加视觉效果
+            addRitualEffect(ritualType);
+        }
+
+        function speakInCourt() {
+            const courtStatus = document.getElementById('court-status');
+            const originalStatus = courtStatus.textContent;
+            
+            courtStatus.textContent = '有人请求发言 - 法官准许';
+            courtStatus.style.color = '#FFD700';
+            
+            showNotification('📢 您已请求发言，请等待法官准许。记住要使用敬语！德行+1');
+            
+            setTimeout(() => {
+                courtStatus.textContent = originalStatus;
+                courtStatus.style.color = '#FFF8DC';
+                showNotification('💬 您可以开始发言了，请注意礼仪用语');
+            }, 3000);
+            
+            updateVirtueScore('speak');
+        }
+
+        function presentEvidence() {
+            showNotification('📜 您向法庭呈递了重要证据，才学+3，威望+2');
+            updateVirtueScore('evidence');
+            
+            // 更新案件进度
+            const currentCase = document.getElementById('current-case');
+            currentCase.innerHTML = `
+                案件: 全球数字身份认证标准之争<br>
+                状态: 正在审查新证据<br>
+                进度: 证据已呈递，法官审阅中
+            `;
+            
+            setTimeout(() => {
+                currentCase.innerHTML = `
+                    案件: 全球数字身份认证标准之争<br>
+                    状态: 正在听取双方陈述<br>
+                    进度: 原告陈述完毕，被告准备发言
+                `;
+            }, 5000);
+        }
+
+        function updateVirtueScore(action) {
+            // 模拟更新四维德行分数
+            const virtueUpdates = {
+                'bow': { virtue: 2, wisdom: 0, prestige: 0, character: 1 },
+                'salute': { virtue: 1, wisdom: 0, prestige: 1, character: 0 },
+                'kneel': { virtue: 1, wisdom: 0, prestige: 1, character: 3 },
+                'speak': { virtue: 1, wisdom: 0, prestige: 0, character: 0 },
+                'evidence': { virtue: 0, wisdom: 3, prestige: 2, character: 1 }
+            };
+            
+            const update = virtueUpdates[action];
+            if (update) {
+                // 这里可以添加实际的分数更新逻辑
+                console.log('德行分数更新:', update);
+                
+                // 模拟分数增长动画
+                Object.keys(update).forEach(key => {
+                    if (update[key] > 0) {
+                        showVirtueIncrease(key, update[key]);
+                    }
+                });
+            }
+        }
+
+        function showVirtueIncrease(virtueType, amount) {
+            // 创建分数增长提示
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(45deg, #FFD700, #FFA500);
+                color: #000;
+                padding: 10px 15px;
+                border-radius: 8px;
+                font-weight: 600;
+                z-index: 10000;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            
+            const virtueNames = {
+                'virtue': '德行',
+                'wisdom': '才学',
+                'prestige': '威望',
+                'character': '品格'
+            };
+            
+            notification.textContent = `${virtueNames[virtueType]} +${amount}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+        }
+
+        function addRitualEffect(ritualType) {
+            // 添加礼仪动作的视觉效果
+            const effectEmojis = {
+                'bow': '🙇‍♂️',
+                'salute': '🤝',
+                'kneel': '🧎‍♂️'
+            };
+            
+            const effect = document.createElement('div');
+            effect.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 4em;
+                z-index: 10000;
+                animation: ritualEffect 2s ease-out forwards;
+                pointer-events: none;
+            `;
+            
+            effect.textContent = effectEmojis[ritualType];
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 2000);
+        }
+
+        function showEtiquetteGuide() {
+            const guide = `
+📖 古代法庭礼仪指南
+
+🎭 基本礼仪：
+• 发言前必须行礼致敬
+• 称呼他人要用敬语（大人、先生等）
+• 不得随意打断他人发言
+• 退场时须向法官告辞
+
+⚖️ 法庭规矩：
+• 听到"威武肃静"须保持安静
+• 向法官发言需先请求许可
+• 呈递证据须双手奉上
+• 对法官判决须表示敬服
+
+🏛️ 等级秩序：
+• 尊重官阶高低有序
+• 年长者优先发言
+• 德高望重者意见优先考虑
+• 违反礼仪将扣除德行分数
+
+遵守礼仪，提升品格！
+            `;
+            
+            showNotification(guide);
+        }
+
+        // 创建新提案
+        function createProposal() {
+            const title = prompt('请输入提案标题：');
+            if (!title) return;
+
+            const content = prompt('请输入提案内容：');
+            if (!content) return;
+
+            showNotification('提案创建成功，等待审核中...', 'success');
+            
+            // 更新统计
+            platformStats.activeProposals++;
+            updateStats();
+        }
+
+        // 查看投票历史
+        function viewVotingHistory() {
+            showNotification('投票历史功能开发中...', 'warning');
+        }
+
+        // AI助手功能
+        async function askAI() {
+            const input = document.getElementById('ai-input');
+            const question = input.value.trim();
+            
+            if (!question) {
+                showNotification('请输入您的问题', 'warning');
+                return;
+            }
+
+            const responseArea = document.getElementById('ai-response');
+            responseArea.innerHTML = '<div class="loading"></div> AI正在思考中...';
+
+            try {
+                // 模拟AI响应
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const responses = [
+                    '根据当前讨论分析，我建议您关注以下几个要点：1) 技术标准的统一性 2) 隐私保护机制 3) 全球协调机制。',
+                    '从投票趋势来看，支持率较高的提案通常具有以下特征：具体可行、影响深远、符合全球利益。',
+                    '建议在讨论中多考虑不同文化背景的观点，这样能够提高提案的接受度和可行性。',
+                    '当前平台的讨论质量很高，建议继续保持理性、建设性的对话氛围。'
+                ];
+                
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                responseArea.innerHTML = `
+                    <p style="color: #e0e0e0; line-height: 1.6;">${randomResponse}</p>
+                    <p style="color: #888; font-size: 0.85em; margin-top: 10px;">
+                        - AI助手 • ${new Date().toLocaleTimeString()}
+                    </p>
+                `;
+                
+                input.value = '';
+                showNotification('AI助手已回复您的问题');
+                
+            } catch (error) {
+                responseArea.innerHTML = '<p style="color: #ff6b6b;">AI助手暂时无法响应，请稍后重试。</p>';
+                showNotification('AI助手响应失败', 'error');
+            }
+        }
+
+        // 模拟实时更新
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                // 随机更新在线用户数
+                const onlineCount = 160 + Math.floor(Math.random() * 10);
+                document.querySelector('.card h3').textContent = `👥 在线大佬 (${onlineCount})`;
+                
+                // 随机更新投票数
+                if (Math.random() < 0.3) {
+                    const supportElement = document.getElementById('support-count-1');
+                    if (supportElement) {
+                        const currentCount = parseInt(supportElement.textContent);
+                        supportElement.textContent = currentCount + 1;
+                        platformStats.totalVotes++;
+                        updateStats();
+                    }
+                }
+            }, 5000);
+        }
+
+        // 初始化
+        function initialize() {
+            updateStats();
+            simulateRealTimeUpdates();
+            showNotification('欢迎来到全球大佬平等讨论平台！');
+            
+            // 模拟加载用户认证
+            setTimeout(() => {
+                showNotification('用户身份验证成功', 'success');
+            }, 1000);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initialize);
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        sendMessage();
+                        break;
+                    case 't':
+                        e.preventDefault();
+                        document.getElementById('message-input').focus();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

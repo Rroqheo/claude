@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puter.js 快速入门 - 四大核心功能</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg), #1e1b4b);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 15px;
+            border: 2px solid var(--primary);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--accent);
+            opacity: 0.9;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+        }
+
+        .example-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .example-title {
+            font-size: 1.4rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .code-section {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .demo-section {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text);
+            opacity: 0.9;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .output {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+        }
+
+        .loading {
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .success { color: var(--success); }
+        .error { color: #ef4444; }
+        .info { color: var(--accent); }
+
+        @media (max-width: 768px) {
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+            .title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🚀 Puter.js 快速入门</h1>
+            <p class="subtitle">四大核心功能演示：AI 聊天 • 云存储 • 键值存储 • 身份验证</p>
+        </div>
+
+        <div class="examples-grid">
+            <!-- 示例1：GPT-4o AI 聊天 -->
+            <div class="example-card">
+                <div class="example-title">
+                    🤖 示例1：GPT-4o AI 聊天
+                </div>
+                <p style="margin-bottom: 15px;">
+                    使用 Puter.js 调用 GPT-4o，无需 API 密钥，完全免费！
+                </p>
+                
+                <div class="code-section">
+&lt;script src="https://js.puter.com/v2/"&gt;&lt;/script&gt;
+&lt;script&gt;
+    puter.ai.chat('Why did the chicken cross the road?')
+        .then(puter.print);
+&lt;/script&gt;
+                </div>
+
+                <div class="demo-section">
+                    <div class="form-group">
+                        <label class="form-label">输入您的问题：</label>
+                        <textarea 
+                            class="form-input form-textarea" 
+                            id="aiQuestion"
+                            placeholder="例如：为什么鸡要过马路？"
+                        >Why did the chicken cross the road?</textarea>
+                    </div>
+                    <button class="btn" onclick="runAIExample()">🚀 开始对话</button>
+                    <div class="output" id="aiOutput">等待 AI 响应...</div>
+                </div>
+            </div>
+
+            <!-- 示例2：云存储 -->
+            <div class="example-card">
+                <div class="example-title">
+                    ☁️ 示例2：云存储
+                </div>
+                <p style="margin-bottom: 15px;">
+                    轻松实现文件的云端存储和读取，数据永久保存。
+                </p>
+                
+                <div class="code-section">
+&lt;script&gt;
+async function fileDemo() {
+    // 写入文件
+    await puter.fs.write('hello.txt', 'Hello, Puter!');
+    puter.print('File written successfully&lt;br&gt;');
+
+    // 读取文件
+    const fileContent = await puter.fs.read('hello.txt');
+    puter.print('File content: ', await fileContent.text());
+}
+
+fileDemo();
+&lt;/script&gt;
+                </div>
+
+                <div class="demo-section">
+                    <div class="form-group">
+                        <label class="form-label">文件名：</label>
+                        <input class="form-input" id="fileName" value="hello.txt" placeholder="例如：hello.txt">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">文件内容：</label>
+                        <textarea class="form-input form-textarea" id="fileContent" placeholder="输入文件内容...">Hello, Puter!</textarea>
+                    </div>
+                    <button class="btn" onclick="runStorageExample()">💾 保存并读取</button>
+                    <div class="output" id="storageOutput">等待文件操作...</div>
+                </div>
+            </div>
+
+            <!-- 示例3：键值存储 -->
+            <div class="example-card">
+                <div class="example-title">
+                    🗃️ 示例3：键值存储
+                </div>
+                <p style="margin-bottom: 15px;">
+                    云端键值数据库，适合存储用户偏好、应用设置等。
+                </p>
+                
+                <div class="code-section">
+&lt;script&gt;
+async function kvDemo() {
+    // 设置值
+    await puter.kv.set('user_preference', 'dark_mode');
+    puter.print('Preference saved&lt;br&gt;');
+
+    // 获取值
+    const preference = await puter.kv.get('user_preference');
+    puter.print('User preference:', preference);
+}
+
+kvDemo();
+&lt;/script&gt;
+                </div>
+
+                <div class="demo-section">
+                    <div class="form-group">
+                        <label class="form-label">键名：</label>
+                        <input class="form-input" id="kvKey" value="user_preference" placeholder="例如：user_preference">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">值：</label>
+                        <input class="form-input" id="kvValue" value="dark_mode" placeholder="例如：dark_mode">
+                    </div>
+                    <button class="btn" onclick="runKVExample()">🔄 保存并获取</button>
+                    <div class="output" id="kvOutput">等待键值操作...</div>
+                </div>
+            </div>
+
+            <!-- 示例4：身份验证 -->
+            <div class="example-card">
+                <div class="example-title">
+                    🔐 示例4：身份验证
+                </div>
+                <p style="margin-bottom: 15px;">
+                    自动处理用户登录，访问云服务时自动提示认证。
+                </p>
+                
+                <div class="code-section">
+&lt;script&gt;
+async function authDemo() {
+    // 检查登录状态
+    const isSignedIn = puter.auth.isSignedIn();
+    puter.print('Is user signed in? ', isSignedIn, '&lt;br&gt;');
+
+    if (!isSignedIn) {
+        // 触发登录
+        await puter.auth.signIn();
+        puter.print('User signed in successfully&lt;br&gt;');
+    }
+
+    // 获取用户信息
+    const user = await puter.auth.getUser();
+    puter.print('User info:', JSON.stringify(user));
+}
+
+authDemo();
+&lt;/script&gt;
+                </div>
+
+                <div class="demo-section">
+                    <button class="btn" onclick="checkAuth()">🔍 检查状态</button>
+                    <button class="btn" onclick="signIn()">🚪 登录</button>
+                    <button class="btn" onclick="getUserInfo()">👤 用户信息</button>
+                    <div class="output" id="authOutput">等待身份验证操作...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 工具函数
+        function showLoading(elementId, message = '处理中...') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="loading"><div class="spinner"></div>${message}</div>`;
+        }
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            element.innerHTML = `<div class="${type}">[${timestamp}] ${message}</div>`;
+        }
+
+        // 示例1：AI 聊天
+        async function runAIExample() {
+            const question = document.getElementById('aiQuestion').value.trim();
+            if (!question) {
+                showResult('aiOutput', '请输入问题！', 'error');
+                return;
+            }
+
+            showLoading('aiOutput', '正在与 GPT-4o 对话...');
+
+            try {
+                const response = await puter.ai.chat(question);
+                showResult('aiOutput', `🤖 AI 回复:\n\n${response}`, 'success');
+            } catch (error) {
+                showResult('aiOutput', `❌ AI 对话失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 示例2：云存储
+        async function runStorageExample() {
+            const fileName = document.getElementById('fileName').value.trim();
+            const fileContent = document.getElementById('fileContent').value.trim();
+            
+            if (!fileName || !fileContent) {
+                showResult('storageOutput', '请输入文件名和内容！', 'error');
+                return;
+            }
+
+            showLoading('storageOutput', '正在保存和读取文件...');
+
+            try {
+                // 写入文件
+                await puter.fs.write(fileName, fileContent);
+                
+                // 读取文件
+                const file = await puter.fs.read(fileName);
+                const content = await file.text();
+                
+                showResult('storageOutput', `✅ 文件操作成功！\n\n写入文件: ${fileName}\n文件内容: ${content}\n文件大小: ${content.length} 字符`, 'success');
+            } catch (error) {
+                showResult('storageOutput', `❌ 文件操作失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 示例3：键值存储
+        async function runKVExample() {
+            const key = document.getElementById('kvKey').value.trim();
+            const value = document.getElementById('kvValue').value.trim();
+            
+            if (!key || !value) {
+                showResult('kvOutput', '请输入键名和值！', 'error');
+                return;
+            }
+
+            showLoading('kvOutput', '正在保存和获取键值对...');
+
+            try {
+                // 设置值
+                await puter.kv.set(key, value);
+                
+                // 获取值
+                const retrievedValue = await puter.kv.get(key);
+                
+                showResult('kvOutput', `✅ 键值操作成功！\n\n保存键值对: ${key} = ${value}\n获取到的值: ${retrievedValue}`, 'success');
+            } catch (error) {
+                showResult('kvOutput', `❌ 键值操作失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 示例4：身份验证
+        async function checkAuth() {
+            showLoading('authOutput', '检查身份验证状态...');
+
+            try {
+                const isSignedIn = puter.auth.isSignedIn();
+                const status = isSignedIn ? '✅ 已登录' : '❌ 未登录';
+                showResult('authOutput', `身份验证状态: ${status}`, 'info');
+            } catch (error) {
+                showResult('authOutput', `❌ 检查失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function signIn() {
+            showLoading('authOutput', '正在处理登录...');
+
+            try {
+                await puter.auth.signIn();
+                showResult('authOutput', '✅ 用户登录成功！', 'success');
+            } catch (error) {
+                showResult('authOutput', `❌ 登录失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function getUserInfo() {
+            showLoading('authOutput', '获取用户信息...');
+
+            try {
+                const user = await puter.auth.getUser();
+                showResult('authOutput', `✅ 用户信息:\n\n${JSON.stringify(user, null, 2)}`, 'success');
+            } catch (error) {
+                showResult('authOutput', `❌ 获取失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                const activeElement = document.activeElement;
+                if (activeElement.id === 'aiQuestion') {
+                    runAIExample();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

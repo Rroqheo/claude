@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puter.js OCR 演示 - 免费图像文字识别</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 25%, #2a0a0a 50%, #1a0a0a 75%, #0a0a0a 100%);
+            color: #ff6b6b;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(45deg, #1a0000, #330000, #1a0000);
+            border-radius: 15px;
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #ff3333;
+            background: linear-gradient(45deg, #ff6b6b, #ff3333, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature {
+            background: rgba(255, 51, 51, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ff3333;
+            text-align: center;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: linear-gradient(135deg, #1a0000, #2a0000);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.2);
+        }
+
+        .section h2 {
+            color: #ff3333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px #ff3333;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff3333;
+            border-radius: 8px;
+            color: #ff6b6b;
+            font-size: 16px;
+        }
+
+        .input-group input[type="text"]:focus,
+        .input-group input[type="file"]:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff3333, #ff6b6b);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(45deg, #ff6b6b, #ff9999);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 51, 51, 0.4);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .drop-zone {
+            border: 3px dashed #ff3333;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            background: rgba(255, 51, 51, 0.05);
+        }
+
+        .drop-zone.dragover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            transform: scale(1.02);
+        }
+
+        .preview-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+        }
+
+        .result-container {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #ff3333;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 150px;
+        }
+
+        .result-text {
+            color: #ff6b6b;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        .batch-section {
+            grid-column: 1 / -1;
+        }
+
+        .batch-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .batch-item {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid #ff3333;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .batch-item h4 {
+            color: #ff3333;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff3333, #ff6b6b);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats-section {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1a0000, #2a0000);
+            border: 2px solid #ff3333;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff3333;
+            text-shadow: 0 0 10px #ff3333;
+        }
+
+        .stat-label {
+            color: #ff6b6b;
+            margin-top: 5px;
+        }
+
+        .history-section {
+            grid-column: 1 / -1;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid #ff3333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 51, 51, 0.3);
+            border-radius: 50%;
+            border-top-color: #ff3333;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #ff9999;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff3333;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #99ff99;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #33ff33;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ff3333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部介绍 -->
+        <div class="header">
+            <h1>🔥 Puter.js OCR 演示</h1>
+            <p>免费的图像文字识别服务 - 无需API密钥，即开即用</p>
+            <div class="features">
+                <div class="feature">📷 支持多种图像格式</div>
+                <div class="feature">🚀 即时文字提取</div>
+                <div class="feature">📦 批量处理</div>
+                <div class="feature">💾 结果保存</div>
+                <div class="feature">📊 实时统计</div>
+                <div class="feature">🎯 高精度识别</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- 单图像OCR -->
+            <div class="section">
+                <h2>🖼️ 单图像OCR</h2>
+                
+                <div class="input-group">
+                    <label>图像URL：</label>
+                    <input type="text" id="image-url" placeholder="输入图像URL" 
+                           value="https://cdn.handwrytten.com/www/2020/02/home-hero-photo2%402x.png">
+                    <button class="btn" onclick="extractFromUrl()">从URL提取文字</button>
+                </div>
+
+                <div class="input-group">
+                    <label>或上传图像文件：</label>
+                    <input type="file" id="single-image" accept="image/*">
+                    <button class="btn" onclick="extractFromFile()">提取文字</button>
+                </div>
+
+                <div class="drop-zone" id="drop-zone">
+                    <p>📁 拖拽图像文件到这里</p>
+                    <p>支持 JPG, PNG, GIF, WebP 等格式</p>
+                </div>
+
+                <div class="preview-container" id="preview-container" style="display: none;">
+                    <h4>图像预览：</h4>
+                    <img id="preview-image" class="preview-image">
+                </div>
+
+                <div class="result-container">
+                    <h4>提取结果：</h4>
+                    <div id="single-result" class="result-text">等待处理图像...</div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-small" onclick="copyResult('single-result')">复制文字</button>
+                        <button class="btn btn-small" onclick="saveResult('single-result')">保存结果</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图像信息 -->
+            <div class="section">
+                <h2>📋 图像信息</h2>
+                <div id="image-info">
+                    <p><strong>文件名：</strong><span id="info-filename">-</span></p>
+                    <p><strong>文件大小：</strong><span id="info-size">-</span></p>
+                    <p><strong>图像尺寸：</strong><span id="info-dimensions">-</span></p>
+                    <p><strong>文件类型：</strong><span id="info-type">-</span></p>
+                    <p><strong>处理时间：</strong><span id="info-time">-</span></p>
+                    <p><strong>提取字符数：</strong><span id="info-chars">-</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量OCR处理 -->
+        <div class="section batch-section">
+            <h2>📦 批量OCR处理</h2>
+            
+            <div class="input-group">
+                <label>选择多个图像文件：</label>
+                <input type="file" id="batch-images" accept="image/*" multiple>
+                <button class="btn" onclick="processBatch()">开始批量处理</button>
+                <button class="btn" onclick="clearBatch()">清空结果</button>
+            </div>
+
+            <div id="batch-progress" style="display: none;">
+                <h4>处理进度：</h4>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <p id="progress-text">准备中...</p>
+            </div>
+
+            <div class="batch-results" id="batch-results"></div>
+
+            <div style="margin-top: 20px; display: none;" id="batch-actions">
+                <button class="btn" onclick="saveBatchResults()">保存所有结果</button>
+                <button class="btn" onclick="exportBatchJson()">导出JSON</button>
+                <button class="btn" onclick="exportBatchTxt()">导出TXT</button>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number" id="stat-total-images">0</div>
+                <div class="stat-label">处理图像总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-total-chars">0</div>
+                <div class="stat-label">提取字符总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-avg-time">0</div>
+                <div class="stat-label">平均处理时间(秒)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-success-rate">100</div>
+                <div class="stat-label">成功率(%)</div>
+            </div>
+        </div>
+
+        <!-- 历史记录 -->
+        <div class="section history-section">
+            <h2>📚 处理历史</h2>
+            <div style="margin-bottom: 15px;">
+                <button class="btn btn-small" onclick="clearHistory()">清空历史</button>
+                <button class="btn btn-small" onclick="exportHistory()">导出历史</button>
+            </div>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let processedResults = [];
+        let processingStats = {
+            totalImages: 0,
+            totalChars: 0,
+            totalTime: 0,
+            successCount: 0,
+            errorCount: 0
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHistory();
+            updateStats();
+            setupDragAndDrop();
+            setupFileInputs();
+        });
+
+        // 设置拖拽上传
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('drop-zone');
+            
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type.startsWith('image/')) {
+                        document.getElementById('single-image').files = files;
+                        showImagePreview(file);
+                        extractFromFile();
+                    } else {
+                        showError('请上传图像文件');
+                    }
+                }
+            });
+        }
+
+        // 设置文件输入监听
+        function setupFileInputs() {
+            document.getElementById('single-image').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    showImagePreview(file);
+                    updateImageInfo(file);
+                }
+            });
+        }
+
+        // 显示图像预览
+        function showImagePreview(file) {
+            const preview = document.getElementById('preview-image');
+            const container = document.getElementById('preview-container');
+            
+            preview.src = URL.createObjectURL(file);
+            container.style.display = 'block';
+        }
+
+        // 更新图像信息
+        function updateImageInfo(file) {
+            document.getElementById('info-filename').textContent = file.name;
+            document.getElementById('info-size').textContent = formatFileSize(file.size);
+            document.getElementById('info-type').textContent = file.type;
+            
+            // 获取图像尺寸
+            const img = new Image();
+            img.onload = function() {
+                document.getElementById('info-dimensions').textContent = `${img.width} × ${img.height}`;
+            };
+            img.src = URL.createObjectURL(file);
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 从URL提取文字
+        async function extractFromUrl() {
+            const imageUrl = document.getElementById('image-url').value;
+            if (!imageUrl) {
+                showError('请输入图像URL');
+                return;
+            }
+
+            const resultDiv = document.getElementById('single-result');
+            resultDiv.innerHTML = '<div class="loading"></div> 正在处理图像...';
+            
+            const startTime = Date.now();
+            
+            try {
+                const text = await puter.ai.img2txt(imageUrl);
+                const processingTime = (Date.now() - startTime) / 1000;
+                
+                resultDiv.textContent = text || '未在图像中找到文字';
+                
+                // 更新信息
+                document.getElementById('info-filename').textContent = imageUrl.split('/').pop();
+                document.getElementById('info-time').textContent = processingTime.toFixed(2) + '秒';
+                document.getElementById('info-chars').textContent = (text || '').length;
+                
+                // 保存到历史
+                saveToHistory({
+                    type: 'url',
+                    source: imageUrl,
+                    text: text || '',
+                    timestamp: new Date().toISOString(),
+                    processingTime: processingTime
+                });
+                
+                // 更新统计
+                updateProcessingStats(text || '', processingTime, true);
+                
+                showSuccess('文字提取成功！');
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">错误: ' + error.message + '</div>';
+                updateProcessingStats('', (Date.now() - startTime) / 1000, false);
+                showError('处理失败: ' + error.message);
+            }
+        }
+
+        // 从文件提取文字
+        async function extractFromFile() {
+            const fileInput = document.getElementById('single-image');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showError('请先选择图像文件');
+                return;
+            }
+
+            const resultDiv = document.getElementById('single-result');
+            resultDiv.innerHTML = '<div class="loading"></div> 正在处理图像...';
+            
+            const startTime = Date.now();
+            
+            try {
+                // 转换为data URL
+                const dataUrl = await fileToDataURL(file);
+                const text = await puter.ai.img2txt(dataUrl);
+                const processingTime = (Date.now() - startTime) / 1000;
+                
+                resultDiv.textContent = text || '未在图像中找到文字';
+                
+                // 更新信息
+                document.getElementById('info-time').textContent = processingTime.toFixed(2) + '秒';
+                document.getElementById('info-chars').textContent = (text || '').length;
+                
+                // 保存到历史
+                saveToHistory({
+                    type: 'file',
+                    source: file.name,
+                    text: text || '',
+                    timestamp: new Date().toISOString(),
+                    processingTime: processingTime
+                });
+                
+                // 更新统计
+                updateProcessingStats(text || '', processingTime, true);
+                
+                showSuccess('文字提取成功！');
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error">错误: ' + error.message + '</div>';
+                updateProcessingStats('', (Date.now() - startTime) / 1000, false);
+                showError('处理失败: ' + error.message);
+            }
+        }
+
+        // 文件转换为Data URL
+        function fileToDataURL(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 批量处理
+        async function processBatch() {
+            const files = document.getElementById('batch-images').files;
+            if (files.length === 0) {
+                showError('请先选择图像文件');
+                return;
+            }
+
+            const progressDiv = document.getElementById('batch-progress');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const resultsDiv = document.getElementById('batch-results');
+            const actionsDiv = document.getElementById('batch-actions');
+            
+            progressDiv.style.display = 'block';
+            resultsDiv.innerHTML = '';
+            processedResults = [];
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const progress = ((i + 1) / files.length) * 100;
+                
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `处理中 ${i + 1}/${files.length}: ${file.name}`;
+
+                const startTime = Date.now();
+                
+                try {
+                    const dataUrl = await fileToDataURL(file);
+                    const text = await puter.ai.img2txt(dataUrl);
+                    const processingTime = (Date.now() - startTime) / 1000;
+                    
+                    const result = {
+                        filename: file.name,
+                        text: text || '',
+                        timestamp: new Date().toISOString(),
+                        processingTime: processingTime,
+                        success: true
+                    };
+                    
+                    processedResults.push(result);
+                    
+                    // 显示结果
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'batch-item';
+                    resultDiv.innerHTML = `
+                        <h4>📄 ${file.name}</h4>
+                        <p><strong>处理时间：</strong>${processingTime.toFixed(2)}秒</p>
+                        <p><strong>字符数：</strong>${text.length}</p>
+                        <div class="result-text" style="max-height: 150px; overflow-y: auto; margin: 10px 0;">
+                            ${text || '未找到文字'}
+                        </div>
+                        <button class="btn btn-small" onclick="copyText('${text.replace(/'/g, "\\'")}')">复制</button>
+                    `;
+                    resultsDiv.appendChild(resultDiv);
+                    
+                    // 更新统计
+                    updateProcessingStats(text || '', processingTime, true);
+                    
+                } catch (error) {
+                    const result = {
+                        filename: file.name,
+                        error: error.message,
+                        timestamp: new Date().toISOString(),
+                        processingTime: (Date.now() - startTime) / 1000,
+                        success: false
+                    };
+                    
+                    processedResults.push(result);
+                    
+                    // 显示错误
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'batch-item';
+                    resultDiv.innerHTML = `
+                        <h4>❌ ${file.name}</h4>
+                        <div class="error">错误: ${error.message}</div>
+                    `;
+                    resultsDiv.appendChild(resultDiv);
+                    
+                    // 更新统计
+                    updateProcessingStats('', (Date.now() - startTime) / 1000, false);
+                }
+            }
+
+            progressText.textContent = '批量处理完成！';
+            actionsDiv.style.display = 'block';
+            
+            // 保存批量结果到历史
+            saveToHistory({
+                type: 'batch',
+                source: `${files.length} 个文件`,
+                text: `处理了 ${files.length} 个文件`,
+                timestamp: new Date().toISOString(),
+                batchResults: processedResults
+            });
+            
+            showSuccess(`批量处理完成！成功处理 ${processedResults.filter(r => r.success).length}/${files.length} 个文件`);
+        }
+
+        // 清空批量结果
+        function clearBatch() {
+            document.getElementById('batch-results').innerHTML = '';
+            document.getElementById('batch-progress').style.display = 'none';
+            document.getElementById('batch-actions').style.display = 'none';
+            document.getElementById('batch-images').value = '';
+            processedResults = [];
+        }
+
+        // 保存批量结果
+        function saveBatchResults() {
+            if (processedResults.length === 0) {
+                showError('没有可保存的结果');
+                return;
+            }
+            
+            const content = processedResults.map(result => {
+                if (result.success) {
+                    return `文件: ${result.filename}\n时间: ${result.timestamp}\n内容: ${result.text}\n${'='.repeat(50)}\n`;
+                } else {
+                    return `文件: ${result.filename}\n时间: ${result.timestamp}\n错误: ${result.error}\n${'='.repeat(50)}\n`;
+                }
+            }).join('\n');
+            
+            downloadFile(content, 'batch-ocr-results.txt', 'text/plain');
+        }
+
+        // 导出JSON
+        function exportBatchJson() {
+            if (processedResults.length === 0) {
+                showError('没有可导出的结果');
+                return;
+            }
+            
+            const jsonContent = JSON.stringify(processedResults, null, 2);
+            downloadFile(jsonContent, 'batch-ocr-results.json', 'application/json');
+        }
+
+        // 导出TXT
+        function exportBatchTxt() {
+            if (processedResults.length === 0) {
+                showError('没有可导出的结果');
+                return;
+            }
+            
+            const txtContent = processedResults
+                .filter(r => r.success)
+                .map(r => r.text)
+                .join('\n\n');
+            
+            downloadFile(txtContent, 'extracted-text.txt', 'text/plain');
+        }
+
+        // 复制结果
+        function copyResult(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showSuccess('文字已复制到剪贴板');
+            }).catch(() => {
+                showError('复制失败');
+            });
+        }
+
+        // 复制文字
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showSuccess('文字已复制到剪贴板');
+            }).catch(() => {
+                showError('复制失败');
+            });
+        }
+
+        // 保存单个结果
+        function saveResult(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            if (!text || text === '等待处理图像...') {
+                showError('没有可保存的内容');
+                return;
+            }
+            
+            downloadFile(text, 'ocr-result.txt', 'text/plain');
+        }
+
+        // 下载文件
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showSuccess(`文件 ${filename} 已下载`);
+        }
+
+        // 更新处理统计
+        function updateProcessingStats(text, processingTime, success) {
+            processingStats.totalImages++;
+            processingStats.totalChars += text.length;
+            processingStats.totalTime += processingTime;
+            
+            if (success) {
+                processingStats.successCount++;
+            } else {
+                processingStats.errorCount++;
+            }
+            
+            updateStats();
+        }
+
+        // 更新统计显示
+        function updateStats() {
+            document.getElementById('stat-total-images').textContent = processingStats.totalImages;
+            document.getElementById('stat-total-chars').textContent = processingStats.totalChars.toLocaleString();
+            
+            const avgTime = processingStats.totalImages > 0 ? 
+                (processingStats.totalTime / processingStats.totalImages).toFixed(2) : '0';
+            document.getElementById('stat-avg-time').textContent = avgTime;
+            
+            const successRate = processingStats.totalImages > 0 ? 
+                ((processingStats.successCount / processingStats.totalImages) * 100).toFixed(1) : '100';
+            document.getElementById('stat-success-rate').textContent = successRate;
+        }
+
+        // 保存到历史
+        function saveToHistory(record) {
+            let history = JSON.parse(localStorage.getItem('ocrHistory') || '[]');
+            history.unshift(record);
+            
+            // 限制历史记录数量
+            if (history.length > 100) {
+                history = history.slice(0, 100);
+            }
+            
+            localStorage.setItem('ocrHistory', JSON.stringify(history));
+            loadHistory();
+        }
+
+        // 加载历史记录
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('ocrHistory') || '[]');
+            const historyList = document.getElementById('history-list');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #666;">暂无历史记录</p>';
+                return;
+            }
+            
+            historyList.innerHTML = history.map((record, index) => `
+                <div class="history-item">
+                    <div class="history-info">
+                        <strong>${record.type === 'url' ? '🌐' : record.type === 'file' ? '📄' : '📦'} ${record.source}</strong>
+                        <p>时间: ${new Date(record.timestamp).toLocaleString()}</p>
+                        <p>内容: ${record.text.substring(0, 100)}${record.text.length > 100 ? '...' : ''}</p>
+                    </div>
+                    <div class="history-actions">
+                        <button class="btn btn-small" onclick="copyText('${record.text.replace(/'/g, "\\'")}')">复制</button>
+                        <button class="btn btn-small" onclick="deleteHistoryItem(${index})">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 删除历史记录项
+        function deleteHistoryItem(index) {
+            let history = JSON.parse(localStorage.getItem('ocrHistory') || '[]');
+            history.splice(index, 1);
+            localStorage.setItem('ocrHistory', JSON.stringify(history));
+            loadHistory();
+            showSuccess('历史记录已删除');
+        }
+
+        // 清空历史记录
+        function clearHistory() {
+            if (confirm('确定要清空所有历史记录吗？')) {
+                localStorage.removeItem('ocrHistory');
+                loadHistory();
+                showSuccess('历史记录已清空');
+            }
+        }
+
+        // 导出历史记录
+        function exportHistory() {
+            const history = JSON.parse(localStorage.getItem('ocrHistory') || '[]');
+            if (history.length === 0) {
+                showError('没有可导出的历史记录');
+                return;
+            }
+            
+            const jsonContent = JSON.stringify(history, null, 2);
+            downloadFile(jsonContent, 'ocr-history.json', 'application/json');
+        }
+
+        // 显示成功消息
+        function showSuccess(message) {
+            const div = document.createElement('div');
+            div.className = 'success';
+            div.textContent = message;
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                document.body.removeChild(div);
+            }, 3000);
+        }
+
+        // 显示错误消息
+        function showError(message) {
+            const div = document.createElement('div');
+            div.className = 'error';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.right = '20px';
+            div.style.zIndex = '1000';
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                document.body.removeChild(div);
+            }, 3000);
+        }
+
+        // 快捷键支持
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'u':
+                        e.preventDefault();
+                        extractFromUrl();
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        extractFromFile();
+                        break;
+                    case 'b':
+                        e.preventDefault();
+                        processBatch();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

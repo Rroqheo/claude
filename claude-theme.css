@@ -1,0 +1,74 @@
+/* Claude 专用界面样式 */
+:root {
+  --claude-primary: #cc785c;
+  --claude-secondary: #d4896b;
+  --claude-bg: #faf9f7;
+  --claude-surface: #ffffff;
+  --claude-text: #2d2d2d;
+  --claude-border: #e8e6e3;
+}
+
+.claude-container {
+  background: var(--claude-bg);
+  color: var(--claude-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: 100vh;
+}
+
+.claude-header {
+  background: linear-gradient(135deg, var(--claude-primary), var(--claude-secondary));
+  color: white;
+  padding: 24px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(204, 120, 92, 0.2);
+}
+
+.claude-chat {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.claude-message {
+  background: var(--claude-surface);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--claude-border);
+}
+
+.claude-input {
+  width: 100%;
+  padding: 18px;
+  border: 2px solid var(--claude-border);
+  border-radius: 12px;
+  font-size: 16px;
+  background: var(--claude-surface);
+  font-family: inherit;
+}
+
+.claude-input:focus {
+  outline: none;
+  border-color: var(--claude-primary);
+  box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.1);
+}
+
+.claude-button {
+  background: var(--claude-primary);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.claude-button:hover {
+  background: var(--claude-secondary);
+  transform: translateY(-1px);
+}
