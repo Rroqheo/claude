@@ -1,0 +1,96 @@
+services:
+  # Development environment
+  claudia-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "1420:1420"  # Vite dev server
+      - "1421:1421"  # Vite HMR
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/src-tauri/target
+    environment:
+      - NODE_ENV=development
+      - TAURI_DEV_HOST=0.0.0.0
+    working_dir: /app
+    command: bun run dev
+    profiles:
+      - dev
+
+  # Build environment
+  claudia-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    volumes:
+      - ./dist:/app/dist
+      - ./src-tauri/target:/app/src-tauri/target
+    working_dir: /app
+    command: bun run tauri build
+    profiles:
+      - build
+
+  # Extract build artifacts
+  claudia-artifacts:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: artifacts
+    volumes:
+      - ./artifacts:/artifacts
+    command: >
+      sh -c "
+        cp /claudia /artifacts/ &&
+        cp -r /bundle /artifacts/
+      "
+    profiles:
+      - artifacts
+
+  # Development with X11 forwarding (for testing GUI on Linux)
+  claudia-gui:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "1420:1420"
+      - "1421:1421"
+    volumes:
+      - .:/app
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - $HOME/.Xauthority:/root/.Xauthority:rw
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - NODE_ENV=development
+      - TAURI_DEV_HOST=0.0.0.0
+    network_mode: host
+    profiles:
+      - gui
+
+  # Web-only development (just the React frontend)
+  claudia-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "1420:1420"
+      - "1421:1421"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    working_dir: /app
+    command: bun run dev
+    profiles:
+      - web
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  node_modules:
+  cargo_target:
