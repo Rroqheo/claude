@@ -1,0 +1,59 @@
+version: '3.8'
+
+# Development override for Claudia Docker setup
+# Use with: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  claudia:
+    build:
+      target: backend-builder  # Stop at build stage for development
+    volumes:
+      - .:/app:rw  # Mount source code for live editing
+      - /app/node_modules  # Prevent overwriting node_modules
+      - /app/src-tauri/target  # Prevent overwriting target directory
+    environment:
+      - NODE_ENV=development
+      - RUST_LOG=debug
+      - TAURI_DEBUG=true
+    ports:
+      - "3000:3000"  # Development server port
+      - "5173:5173"  # Vite dev server
+    command: |
+      sh -c "
+        # Install dependencies if needed
+        bun install
+        # Start development server
+        bun run tauri dev
+      "
+    stdin_open: true
+    tty: true
+
+  # Development database with sample data
+  postgres:
+    environment:
+      POSTGRES_DB: claudia_dev
+      POSTGRES_USER: claudia_dev
+      POSTGRES_PASSWORD: dev123
+    ports:
+      - "5433:5432"  # Use different port for dev
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+      - ./dev-data:/docker-entrypoint-initdb.d/dev-data
+
+  # Redis with development configuration
+  redis:
+    command: redis-server --appendonly yes --loglevel debug
+    ports:
+      - "6380:6379"  # Use different port for dev
+
+  # Hot-reload nginx for development
+  nginx:
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro  # Development nginx config
+    ports:
+      - "8080:80"  # Use different port for dev
+
+volumes:
+  postgres_dev_data:
+    driver: local

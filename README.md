@@ -256,6 +256,19 @@ Settings → Puter Integration → Authenticate → Sync Files → Access Cloud 
 
 - **Claude Code CLI**: Install from [Claude's official site](https://claude.ai/code)
 
+### 🐳 Docker Installation (Recommended)
+
+The easiest way to run Claudia is using Docker, which solves the "docker 绑定了没有" (Docker binding) issue:
+
+```bash
+# Quick start with Docker
+git clone https://github.com/getAsterisk/claudia.git
+cd claudia
+./docker-setup.sh up
+```
+
+For complete Docker setup instructions, see [DOCKER.md](DOCKER.md).
+
 ### Release Executables Will Be Published Soon
 
 ## 🔨 Build from Source
