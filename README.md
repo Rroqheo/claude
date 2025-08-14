@@ -256,7 +256,80 @@ Settings → Puter Integration → Authenticate → Sync Files → Access Cloud 
 
 - **Claude Code CLI**: Install from [Claude's official site](https://claude.ai/code)
 
-### Release Executables Will Be Published Soon
+### 🐳 Docker Deployment
+
+Claudia Ultimate Edition now supports Docker deployment for easy development and distribution:
+
+#### Quick Start with Docker
+
+```bash
+# Clone the repository
+git clone https://github.com/getAsterisk/claudia.git
+cd claudia
+
+# Run development environment
+docker-compose --profile dev up
+
+# Or run web-only development (React frontend only)
+docker-compose --profile web up
+
+# Build the application
+docker-compose --profile build up
+
+# Extract build artifacts
+docker-compose --profile artifacts up
+```
+
+#### Development Environment
+
+```bash
+# Start development server with hot reload
+docker-compose --profile dev up claudia-dev
+
+# Access the app at http://localhost:1420
+```
+
+#### Building Binaries
+
+```bash
+# Build production binaries using Docker
+docker build --target artifacts --output ./build .
+
+# Or use docker-compose
+docker-compose --profile build up claudia-build
+```
+
+#### GUI Development (Linux with X11)
+
+```bash
+# Enable X11 forwarding for GUI development
+xhost +local:docker
+docker-compose --profile gui up claudia-gui
+```
+
+#### GitHub Container Registry
+
+Pre-built Docker images are available from GitHub Container Registry:
+
+```bash
+# Pull the latest development image
+docker pull ghcr.io/rroqheo/claude:dev-latest
+
+# Pull the latest production image
+docker pull ghcr.io/rroqheo/claude:latest
+
+# Run development environment
+docker run -p 1420:1420 -p 1421:1421 ghcr.io/rroqheo/claude:dev-latest
+```
+
+### Release Executables
+
+Release executables are automatically built and published through GitHub Actions for:
+- **Linux**: AppImage and .deb packages
+- **macOS**: Universal binaries (Intel + Apple Silicon)
+- **Windows**: .msi and .exe installers
+
+Download the latest release from the [Releases page](https://github.com/getAsterisk/claudia/releases).
 
 ## 🔨 Build from Source
 
@@ -469,6 +542,22 @@ cd src-tauri && cargo test
 
 # Format code
 cd src-tauri && cargo fmt
+```
+
+### 🐳 Docker Development
+
+```bash
+# Development with Docker
+docker-compose --profile dev up
+
+# Web-only development
+docker-compose --profile web up
+
+# Build in Docker
+docker-compose --profile build up
+
+# GUI development (Linux)
+docker-compose --profile gui up
 ```
 
 ## 🔒 Security
