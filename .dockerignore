@@ -1,0 +1,90 @@
+# Docker ignore file for Claudia Ultimate Edition
+# Exclude unnecessary files from Docker build context
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Dependencies and caches
+node_modules
+.bun
+dist
+build
+target
+.next
+.nuxt
+.output
+.vercel
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+.env.*
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# Test files
+coverage
+.nyc_output
+.coverage
+
+# Temporary files
+tmp
+temp
+*.tmp
+*.temp
+
+# Documentation that's not needed in container
+*.md
+docs/
+documentation/
+
+# Docker files (avoid recursion)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Build artifacts that will be generated
+src-tauri/target/
+src-tauri/Cargo.lock
+
+# User-specific files
+Users/
+.claude/
+
+# Development scripts
+*.sh
+deploy-*
+github-*
+hell-gate-*
+integrate-*
+setup-*
+start-*
+
+# Theme CSS files not needed for build
+*-theme.css
+
+# Reports and analysis
+*Report.csv
+*REPORT.md
+security-report.json
+SECURITY_SCAN_REPORT.md
+
+# Agent configurations
+cc_agents/
+
+# Other project files
+bun.lock
