@@ -177,6 +177,7 @@ export const MoneyMakingDashboard: React.FC<MoneyMakingProps> = ({ onEarningsUpd
           onClick={() => {
             setEarnings(prev => prev + 1000);
             setTodayEarnings(prev => prev + 1000);
+            setActiveProjects(prev => prev + 1);
             alert('🎉 恭喜！接到新项目，收入+1000元！');
           }}
         >
