@@ -124,7 +124,6 @@ fi
 # Create database initialization script
 cat > init-scripts/01-init.sql << 'EOF'
 -- Initialize Claudia database
-CREATE DATABASE IF NOT EXISTS claudia;
 
 -- Create user sessions table
 CREATE TABLE IF NOT EXISTS user_sessions (
