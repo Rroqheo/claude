@@ -90,7 +90,7 @@ echo "Checking API endpoints..."
 
 # Check HTTP endpoints
 check_service "Nginx health" "curl -s http://localhost/health | grep -q 'OK'"
-check_service "Ollama API" "curl -s http://localhost:11434/api/tags | grep -q 'models'"
+check_service "Ollama API" "curl -sf http://localhost:11434/api/tags -o /dev/null"
 
 echo ""
 echo "================================"
