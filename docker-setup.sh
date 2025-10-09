@@ -1,235 +1,258 @@
 #!/bin/bash
 
-# Docker Setup Script for Claudia Ultimate Edition
-# This script helps with easy Docker deployment and management
+# Docker Setup Script for Claudia - Multi-AI Desktop Application
+# This script addresses the "docker 绑定了没有" (Docker binding) issue
 
-set -e
+echo "🐳 Setting up Docker environment for Claudia..."
+echo "================================================================"
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Check if Docker is installed
+if ! command -v docker &> /dev/null; then
+    echo "❌ Docker is not installed. Please install Docker first."
+    echo "   Visit: https://docs.docker.com/get-docker/"
+    exit 1
+fi
 
-# Function to print colored output
-print_status() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+# Check if Docker Compose is available
+if ! command -v docker compose &> /dev/null && ! command -v docker-compose &> /dev/null; then
+    echo "❌ Docker Compose is not installed. Please install Docker Compose."
+    echo "   Visit: https://docs.docker.com/compose/install/"
+    exit 1
+fi
+
+# Create necessary directories
+echo "📁 Creating necessary directories..."
+mkdir -p logs init-scripts ssl
+
+# Create environment file if it doesn't exist
+if [ ! -f .env ]; then
+    echo "⚙️  Creating environment configuration..."
+    cat > .env << 'EOF'
+# AI Service API Keys - Replace with your actual keys
+OPENAI_API_KEY=your-openai-api-key-here
+ANTHROPIC_API_KEY=your-claude-api-key-here
+GEMINI_API_KEY=your-gemini-api-key-here
+XAI_API_KEY=your-grok-api-key-here
+QWEN_API_KEY=your-qwen-api-key-here
+DASHSCOPE_API_KEY=your-dashscope-api-key-here
+
+# Database Configuration
+POSTGRES_PASSWORD=claudia123
+GRAFANA_PASSWORD=admin123
+
+# Application Settings
+CLAUDE_DIR=/home/claudia/.claude
+NODE_ENV=production
+EOF
+    echo "✅ Created .env file - Please update it with your actual API keys"
+else
+    echo "✅ Environment file already exists"
+fi
+
+# Create basic nginx configuration
+if [ ! -f nginx.conf ]; then
+    echo "🌐 Creating nginx configuration..."
+    cat > nginx.conf << 'EOF'
+events {
+    worker_connections 1024;
 }
 
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+http {
+    upstream claudia-app {
+        server claudia:3000;
+    }
+    
+    upstream ollama-service {
+        server ollama:11434;
+    }
+    
+    server {
+        listen 80;
+        server_name localhost;
+        
+        # Health check endpoint
+        location /health {
+            return 200 "OK\n";
+            add_header Content-Type text/plain;
+        }
+        
+        # Proxy to Claudia app
+        location / {
+            proxy_pass http://claudia-app;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Proxy to Ollama API
+        location /ollama/ {
+            rewrite ^/ollama/(.*)$ /$1 break;
+            proxy_pass http://ollama-service;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
 }
+EOF
+    echo "✅ Created nginx.conf"
+else
+    echo "✅ Nginx configuration already exists"
+fi
 
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
+# Create Prometheus configuration (optional)
+if [ ! -f prometheus.yml ]; then
+    echo "📊 Creating Prometheus configuration..."
+    cat > prometheus.yml << 'EOF'
+global:
+  scrape_interval: 15s
 
-print_header() {
-    echo -e "${BLUE}$1${NC}"
-}
+scrape_configs:
+  - job_name: 'claudia'
+    static_configs:
+      - targets: ['claudia:3000']
+  - job_name: 'ollama'
+    static_configs:
+      - targets: ['ollama:11434']
+EOF
+    echo "✅ Created prometheus.yml"
+else
+    echo "✅ Prometheus configuration already exists"
+fi
 
-# Function to check if Docker is installed
-check_docker() {
-    if ! command -v docker &> /dev/null; then
-        print_error "Docker is not installed. Please install Docker first."
-        exit 1
-    fi
-    
-    if ! command -v docker-compose &> /dev/null; then
-        print_error "Docker Compose is not installed. Please install Docker Compose first."
-        exit 1
-    fi
-    
-    print_status "Docker and Docker Compose are installed."
-}
+# Create database initialization script
+cat > init-scripts/01-init.sql << 'EOF'
+-- Initialize Claudia database
 
-# Function to display help
-show_help() {
-    print_header "Claudia Ultimate Edition - Docker Setup"
-    echo ""
-    echo "Usage: $0 [COMMAND] [OPTIONS]"
-    echo ""
-    echo "Commands:"
-    echo "  dev        Start development environment"
-    echo "  web        Start web-only development (React frontend)"
-    echo "  gui        Start GUI development (Linux with X11)"
-    echo "  build      Build the application"
-    echo "  artifacts  Extract build artifacts"
-    echo "  clean      Clean up Docker containers and images"
-    echo "  pull       Pull latest images from registry"
-    echo "  logs       Show logs from running containers"
-    echo "  help       Show this help message"
-    echo ""
-    echo "Options:"
-    echo "  --detach   Run in detached mode (background)"
-    echo "  --force    Force rebuild without cache"
-    echo ""
-    echo "Examples:"
-    echo "  $0 dev              # Start development environment"
-    echo "  $0 dev --detach     # Start in background"
-    echo "  $0 build --force    # Force rebuild"
-    echo "  $0 clean            # Clean up Docker resources"
-}
+-- Create user sessions table
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id SERIAL PRIMARY KEY,
+    session_id VARCHAR(255) UNIQUE NOT NULL,
+    ai_service VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    metadata JSONB
+);
 
-# Function to start development environment
-start_dev() {
-    print_status "Starting Claudia development environment..."
-    
-    local args=""
-    if [[ "$1" == "--detach" ]]; then
-        args="-d"
-    fi
-    
-    if [[ "$1" == "--force" || "$2" == "--force" ]]; then
-        print_status "Forcing rebuild..."
-        docker-compose --profile dev build --no-cache
-    fi
-    
-    docker-compose --profile dev up $args
-    
-    if [[ "$1" == "--detach" ]]; then
-        print_status "Development environment is running in background."
-        print_status "Access the app at: http://localhost:1420"
-        print_status "View logs with: $0 logs"
-    fi
-}
+-- Create usage analytics table
+CREATE TABLE IF NOT EXISTS usage_analytics (
+    id SERIAL PRIMARY KEY,
+    session_id VARCHAR(255) REFERENCES user_sessions(session_id),
+    tokens_used INTEGER,
+    cost_estimate DECIMAL(10,4),
+    service VARCHAR(100),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-# Function to start web-only development
-start_web() {
-    print_status "Starting web-only development environment..."
-    
-    local args=""
-    if [[ "$1" == "--detach" ]]; then
-        args="-d"
-    fi
-    
-    if [[ "$1" == "--force" || "$2" == "--force" ]]; then
-        print_status "Forcing rebuild..."
-        docker-compose --profile web build --no-cache
-    fi
-    
-    docker-compose --profile web up $args
-    
-    if [[ "$1" == "--detach" ]]; then
-        print_status "Web development environment is running in background."
-        print_status "Access the app at: http://localhost:1420"
-    fi
-}
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_sessions_service ON user_sessions(ai_service);
+CREATE INDEX IF NOT EXISTS idx_analytics_timestamp ON usage_analytics(timestamp);
+CREATE INDEX IF NOT EXISTS idx_analytics_service ON usage_analytics(service);
+EOF
 
-# Function to start GUI development
-start_gui() {
-    if [[ "$OSTYPE" != "linux-gnu"* ]]; then
-        print_warning "GUI mode is primarily designed for Linux systems."
-        print_warning "You may need to set up X11 forwarding manually on other systems."
-    fi
-    
-    print_status "Starting GUI development environment..."
-    print_status "Enabling X11 forwarding..."
-    
-    # Enable X11 forwarding
-    xhost +local:docker 2>/dev/null || print_warning "Could not enable X11 forwarding. GUI may not work."
-    
-    docker-compose --profile gui up
-}
+echo "✅ Created database initialization script"
 
-# Function to build the application
-build_app() {
-    print_status "Building Claudia Ultimate Edition..."
-    
-    if [[ "$1" == "--force" ]]; then
-        print_status "Forcing rebuild..."
-        docker-compose --profile build build --no-cache
-    fi
-    
-    docker-compose --profile build up
-    print_status "Build completed."
-}
-
-# Function to extract artifacts
-extract_artifacts() {
-    print_status "Extracting build artifacts..."
-    
-    # Create artifacts directory
-    mkdir -p ./artifacts
-    
-    docker-compose --profile artifacts up
-    
-    if [[ -d "./artifacts" ]]; then
-        print_status "Artifacts extracted to ./artifacts/"
-        ls -la ./artifacts/
+# Function to handle different Docker Compose commands
+use_compose() {
+    if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        docker compose "$@"
+    elif command -v docker-compose &> /dev/null; then
+        docker-compose "$@"
     else
-        print_error "Failed to extract artifacts."
+        echo "❌ Neither 'docker compose' nor 'docker-compose' is available"
+        exit 1
     fi
 }
 
-# Function to clean up Docker resources
-clean_docker() {
-    print_status "Cleaning up Docker resources for Claudia..."
-    
-    # Stop all containers
-    docker-compose down --remove-orphans
-    
-    # Remove images
-    docker images | grep claudia | awk '{print $3}' | xargs docker rmi -f 2>/dev/null || true
-    
-    # Prune unused resources
-    docker system prune -f
-    
-    print_status "Cleanup completed."
-}
+echo ""
+echo "🚀 Docker environment setup complete!"
+echo ""
+echo "Available commands:"
+echo "  🏗️  Build and start all services:"
+echo "     ./docker-setup.sh up"
+echo ""
+echo "  🔧 Start with monitoring (Prometheus + Grafana):"
+echo "     ./docker-setup.sh up-with-monitoring"
+echo ""
+echo "  💻 Start development environment:"
+echo "     ./docker-setup.sh dev"
+echo ""
+echo "  🛑 Stop all services:"
+echo "     ./docker-setup.sh down"
+echo ""
+echo "  📊 View logs:"
+echo "     ./docker-setup.sh logs"
+echo ""
+echo "  🔄 Restart services:"
+echo "     ./docker-setup.sh restart"
+echo ""
+echo "  🧹 Clean up everything:"
+echo "     ./docker-setup.sh cleanup"
+echo ""
 
-# Function to pull latest images
-pull_images() {
-    print_status "Pulling latest images from GitHub Container Registry..."
-    
-    docker pull ghcr.io/rroqheo/claude:latest || print_warning "Could not pull latest image"
-    docker pull ghcr.io/rroqheo/claude:dev-latest || print_warning "Could not pull dev image"
-    
-    print_status "Images updated."
-}
-
-# Function to show logs
-show_logs() {
-    print_status "Showing logs from running containers..."
-    docker-compose logs -f
-}
-
-# Main script logic
-case "${1:-help}" in
+# Handle command line arguments
+case "${1:-}" in
+    "up")
+        echo "🏗️ Building and starting Claudia services..."
+        use_compose up -d --build
+        echo ""
+        echo "✅ Services started! Access points:"
+        echo "   🖥️  Claudia VNC: vnc://localhost:5900"
+        echo "   🔄 Nginx proxy: http://localhost"
+        echo "   🧠 Ollama API: http://localhost:11434"
+        echo "   📊 Redis: localhost:6379"
+        echo "   🗄️  PostgreSQL: localhost:5432"
+        ;;
     "dev")
-        check_docker
-        start_dev "${@:2}"
+        echo "💻 Starting development environment..."
+        use_compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+        echo ""
+        echo "✅ Development environment started! Access points:"
+        echo "   🖥️  Claudia Dev: http://localhost:8080"
+        echo "   ⚡ Vite HMR: http://localhost:8080/vite"
+        echo "   🧠 Ollama API: http://localhost:11434"
+        echo "   📊 Redis Dev: localhost:6380" 
+        echo "   🗄️  PostgreSQL Dev: localhost:5433"
+        echo "   📝 Live reload enabled for source code changes"
         ;;
-    "web")
-        check_docker
-        start_web "${@:2}"
+    "up-with-monitoring")
+        echo "🏗️ Building and starting Claudia services with monitoring..."
+        use_compose --profile monitoring up -d --build
+        echo ""
+        echo "✅ Services started with monitoring! Access points:"
+        echo "   🖥️  Claudia VNC: vnc://localhost:5900"
+        echo "   🔄 Nginx proxy: http://localhost"
+        echo "   🧠 Ollama API: http://localhost:11434"
+        echo "   📊 Prometheus: http://localhost:9090"
+        echo "   📈 Grafana: http://localhost:3000 (admin/admin123)"
         ;;
-    "gui")
-        check_docker
-        start_gui "${@:2}"
-        ;;
-    "build")
-        check_docker
-        build_app "${@:2}"
-        ;;
-    "artifacts")
-        check_docker
-        extract_artifacts
-        ;;
-    "clean")
-        check_docker
-        clean_docker
-        ;;
-    "pull")
-        check_docker
-        pull_images
+    "down")
+        echo "🛑 Stopping all services..."
+        use_compose --profile monitoring down
+        echo "✅ All services stopped"
         ;;
     "logs")
-        check_docker
-        show_logs
+        echo "📊 Showing service logs..."
+        use_compose logs -f
         ;;
-    "help"|*)
-        show_help
+    "restart")
+        echo "🔄 Restarting services..."
+        use_compose restart
+        echo "✅ Services restarted"
+        ;;
+    "cleanup")
+        echo "🧹 Cleaning up all containers, volumes, and images..."
+        use_compose --profile monitoring down -v --remove-orphans
+        docker system prune -f
+        echo "✅ Cleanup complete"
+        ;;
+    "")
+        echo "✨ Setup complete! Use one of the commands above to continue."
+        ;;
+    *)
+        echo "❓ Unknown command: $1"
+        echo "   Available: up, up-with-monitoring, dev, down, logs, restart, cleanup"
+        exit 1
         ;;
 esac

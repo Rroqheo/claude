@@ -1,98 +1,125 @@
-# Multi-stage Dockerfile for building Claudia Ultimate Edition
-# This builds the Tauri application and extracts the binaries
+# Multi-stage Docker build for Claudia - Multi-AI Desktop Application
+FROM node:20-bullseye as frontend-builder
 
-# Build stage
-FROM ubuntu:22.04 AS builder
-
-# Prevent interactive prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Install system dependencies
+# Install system dependencies for building
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
-    build-essential \
-    file \
-    libssl-dev \
-    libgtk-3-dev \
-    libayatana-appindicator3-dev \
-    libwebkit2gtk-4.1-dev \
-    librsvg2-dev \
-    patchelf \
-    libxdo-dev \
-    libsoup-3.0-dev \
-    libjavascriptcoregtk-4.1-dev \
     git \
-    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
-
-# Install Bun
+# Install Bun package manager
 RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:${PATH}"
+ENV PATH="/root/.bun/bin:$PATH"
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files first for better layer caching
-COPY package.json package-lock.json bun.lock* ./
-COPY src-tauri/Cargo.toml src-tauri/Cargo.lock* src-tauri/
+# Copy package files
+COPY package.json bun.lock ./
 
-# Install frontend dependencies
-RUN bun install
-
-# Install Rust dependencies
-WORKDIR /app/src-tauri
-RUN cargo fetch
-WORKDIR /app
+# Install dependencies
+RUN bun install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the frontend
 RUN bun run build
-RUN bun run tauri build
 
-# Runtime stage for the built application
-FROM ubuntu:22.04 AS runtime
+# Rust backend stage
+FROM rust:1.75-bullseye as backend-builder
 
-# Install runtime dependencies for the Tauri app
+# Install system dependencies for Tauri
+RUN apt-get update && apt-get install -y \
+    libwebkit2gtk-4.1-dev \
+    libgtk-3-dev \
+    libayatana-appindicator3-dev \
+    librsvg2-dev \
+    patchelf \
+    build-essential \
+    curl \
+    wget \
+    file \
+    libssl-dev \
+    libxdo-dev \
+    libsoup-3.0-dev \
+    libjavascriptcoregtk-4.1-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy Cargo files
+COPY src-tauri/Cargo.toml src-tauri/Cargo.lock ./src-tauri/
+
+# Copy the built frontend from previous stage
+COPY --from=frontend-builder /app/dist ./dist
+
+# Copy Tauri source and configuration
+COPY src-tauri ./src-tauri
+COPY tauri.conf.json ./
+
+# Build Tauri application
+RUN cd src-tauri && cargo build --release
+
+# Final runtime stage
+FROM debian:bullseye-slim
+
+# Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     libwebkit2gtk-4.1-0 \
     libgtk-3-0 \
     libayatana-appindicator3-1 \
     librsvg2-2 \
-    libssl3 \
-    libsoup-3.0-0 \
     ca-certificates \
+    curl \
+    git \
+    xvfb \
+    x11vnc \
+    fluxbox \
     && rm -rf /var/lib/apt/lists/*
 
-# Create app directory
-WORKDIR /app
+# Create a user for running the app
+RUN useradd -m -s /bin/bash claudia
 
-# Copy the built binary from the builder stage
-COPY --from=builder /app/src-tauri/target/release/claudia /app/claudia
+# Copy the built application
+COPY --from=backend-builder /app/src-tauri/target/release/claudia /usr/local/bin/claudia
+COPY --from=frontend-builder /app/dist /opt/claudia/dist
 
-# Copy any additional assets needed
-COPY --from=builder /app/src-tauri/target/release/bundle/deb/*.deb /app/packages/
-COPY --from=builder /app/src-tauri/target/release/bundle/appimage/*.AppImage /app/packages/
+# Set up environment
+ENV DISPLAY=:99
+ENV CLAUDE_DIR=/home/claudia/.claude
 
-# Create a non-root user
-RUN useradd -r -s /bin/false claudia
+# Create necessary directories
+RUN mkdir -p /home/claudia/.claude && \
+    chown -R claudia:claudia /home/claudia
 
-# Make binary executable
-RUN chmod +x /app/claudia
+# Switch to claudia user
+USER claudia
+WORKDIR /home/claudia
 
-# Expose any necessary ports (if running in server mode)
-EXPOSE 8080
+# Create startup script
+RUN echo '#!/bin/bash\n\
+# Start virtual display\n\
+Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &\n\
+sleep 2\n\
+\n\
+# Start window manager\n\
+fluxbox > /dev/null 2>&1 &\n\
+\n\
+# Start VNC server (optional, for remote access)\n\
+x11vnc -display :99 -nopw -listen localhost -xkb -rfbport 5900 -bg\n\
+\n\
+# Start Claudia application\n\
+exec /usr/local/bin/claudia' > /home/claudia/start.sh && \
+    chmod +x /home/claudia/start.sh
 
-# Default command - note: GUI apps need special handling in containers
-CMD ["/app/claudia"]
+# Expose VNC port for optional remote access
+EXPOSE 5900
 
-# Artifacts stage - for extracting build artifacts
-FROM scratch AS artifacts
-COPY --from=builder /app/src-tauri/target/release/claudia /claudia
-COPY --from=builder /app/src-tauri/target/release/bundle/ /bundle/
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD pgrep -f claudia > /dev/null || exit 1
+
+# Default command
+CMD ["/home/claudia/start.sh"]

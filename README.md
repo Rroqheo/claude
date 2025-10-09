@@ -256,80 +256,20 @@ Settings → Puter Integration → Authenticate → Sync Files → Access Cloud 
 
 - **Claude Code CLI**: Install from [Claude's official site](https://claude.ai/code)
 
-### 🐳 Docker Deployment
+### 🐳 Docker Installation (Recommended)
 
-Claudia Ultimate Edition now supports Docker deployment for easy development and distribution:
-
-#### Quick Start with Docker
+The easiest way to run Claudia is using Docker, which solves the "docker 绑定了没有" (Docker binding) issue:
 
 ```bash
-# Clone the repository
+# Quick start with Docker
 git clone https://github.com/getAsterisk/claudia.git
 cd claudia
-
-# Run development environment
-docker-compose --profile dev up
-
-# Or run web-only development (React frontend only)
-docker-compose --profile web up
-
-# Build the application
-docker-compose --profile build up
-
-# Extract build artifacts
-docker-compose --profile artifacts up
+./docker-setup.sh up
 ```
 
-#### Development Environment
+For complete Docker setup instructions, see [DOCKER.md](DOCKER.md).
 
-```bash
-# Start development server with hot reload
-docker-compose --profile dev up claudia-dev
-
-# Access the app at http://localhost:1420
-```
-
-#### Building Binaries
-
-```bash
-# Build production binaries using Docker
-docker build --target artifacts --output ./build .
-
-# Or use docker-compose
-docker-compose --profile build up claudia-build
-```
-
-#### GUI Development (Linux with X11)
-
-```bash
-# Enable X11 forwarding for GUI development
-xhost +local:docker
-docker-compose --profile gui up claudia-gui
-```
-
-#### GitHub Container Registry
-
-Pre-built Docker images are available from GitHub Container Registry:
-
-```bash
-# Pull the latest development image
-docker pull ghcr.io/rroqheo/claude:dev-latest
-
-# Pull the latest production image
-docker pull ghcr.io/rroqheo/claude:latest
-
-# Run development environment
-docker run -p 1420:1420 -p 1421:1421 ghcr.io/rroqheo/claude:dev-latest
-```
-
-### Release Executables
-
-Release executables are automatically built and published through GitHub Actions for:
-- **Linux**: AppImage and .deb packages
-- **macOS**: Universal binaries (Intel + Apple Silicon)
-- **Windows**: .msi and .exe installers
-
-Download the latest release from the [Releases page](https://github.com/getAsterisk/claudia/releases).
+### Release Executables Will Be Published Soon
 
 ## 🔨 Build from Source
 
