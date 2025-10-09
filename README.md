@@ -484,6 +484,22 @@ cd src-tauri && cargo test
 cd src-tauri && cargo fmt
 ```
 
+### 🐳 Docker Development
+
+```bash
+# Development with Docker
+docker-compose --profile dev up
+
+# Web-only development
+docker-compose --profile web up
+
+# Build in Docker
+docker-compose --profile build up
+
+# GUI development (Linux)
+docker-compose --profile gui up
+```
+
 ## 🔒 Security
 
 Claudia prioritizes your privacy and security:
